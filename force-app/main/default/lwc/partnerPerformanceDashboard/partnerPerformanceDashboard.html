@@ -1,0 +1,114 @@
+<template>
+    <!-- Header Section using genericPageHeader component -->
+    <c-generic-page-header
+        title="Partner Performance Dashboard"
+        subtitle="Track key KPIs for integration partners including leads, opportunities, and revenue metrics"
+        icon-name="standard:analytics"
+        show-refresh-button="true"
+        is-loading={isLoading}
+        onrefresh={handleRefresh}>
+    </c-generic-page-header>
+
+    <!-- Main Dashboard Content -->
+    <div class="slds-container_large slds-container_center slds-p-around_medium">
+        
+        <!-- KPI Tiles Section -->
+        <div class="slds-section">
+            <div class="slds-section__title-action">
+                <h3 class="slds-text-heading_small slds-m-bottom_medium">Key Performance Indicators</h3>
+            </div>
+            
+            <div class="slds-grid slds-wrap slds-gutters">
+                <!-- Total Partners KPI -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+                    <lightning-card class="kpi-card">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="standard:account" size="medium" alternative-text="Total Partners"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <h4 class="slds-text-heading_small">Total Partners</h4>
+                                <p class="slds-text-title kpi-value">--</p>
+                            </div>
+                        </div>
+                    </lightning-card>
+                </div>
+
+                <!-- Total Revenue KPI -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+                    <lightning-card class="kpi-card">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="standard:currency" size="medium" alternative-text="Total Revenue"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <h4 class="slds-text-heading_small">Total Revenue</h4>
+                                <p class="slds-text-title kpi-value">--</p>
+                            </div>
+                        </div>
+                    </lightning-card>
+                </div>
+
+                <!-- Average Win Rate KPI -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+                    <lightning-card class="kpi-card">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="standard:opportunity" size="medium" alternative-text="Average Win Rate"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <h4 class="slds-text-heading_small">Average Win Rate</h4>
+                                <p class="slds-text-title kpi-value">--</p>
+                            </div>
+                        </div>
+                    </lightning-card>
+                </div>
+
+                <!-- Top Performing Tier KPI -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+                    <lightning-card class="kpi-card">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="standard:awards" size="medium" alternative-text="Top Tier"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <h4 class="slds-text-heading_small">Top Performing Tier</h4>
+                                <p class="slds-text-title kpi-value">--</p>
+                            </div>
+                        </div>
+                    </lightning-card>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partner Performance Table Section -->
+        <div class="slds-section slds-m-top_large">
+            <div class="slds-section__title-action">
+                <h3 class="slds-text-heading_small slds-m-bottom_medium">Partner Performance Details</h3>
+            </div>
+            
+            <lightning-card>
+                <div class="table-container">
+                    <!-- Placeholder for data table -->
+                    <div class="slds-text-align_center slds-p-around_large">
+                        <lightning-icon icon-name="standard:datatable" size="large" alternative-text="Data Table"></lightning-icon>
+                        <h4 class="slds-text-heading_small slds-m-top_small">Partner Performance Table</h4>
+                        <p class="slds-text-body_regular slds-text-color_weak">
+                            This table will display sortable partner performance data including:
+                            <br/>Rank, Partner Name, Tier, Leads, Converted, Opportunities, Won, Revenue, Win Rate
+                        </p>
+                        <div class="slds-m-top_medium">
+                            <lightning-button 
+                                variant="brand" 
+                                label="Load Data" 
+                                title="Load partner performance data"
+                                disabled="true"
+                                class="placeholder-button">
+                            </lightning-button>
+                        </div>
+                    </div>
+                </div>
+            </lightning-card>
+        </div>
+    </div>
+</template>

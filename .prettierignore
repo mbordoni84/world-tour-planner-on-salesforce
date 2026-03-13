@@ -1,0 +1,9 @@
+**/.localdevserver
+**/.sfdx
+**/.sf
+**/coverage
+**/lwc/**/*.css
+**/node_modules
+**/dist
+**/tmp
+**/.git

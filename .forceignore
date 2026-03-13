@@ -1,0 +1,32 @@
+# List files or directories below to ignore them when running force:source:push, force:source:pull, and force:source:status
+# More information: https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_exclude_source.htm
+#
+
+package.json
+package-lock.json
+node_modules/
+npm-debug.log
+nyc_output/
+.nyc_output/
+coverage/
+.jest/
+.vscode/
+.DS_Store
+.husky/
+.sf/
+.sfdx/
+.localdevserver/
+.prettierrc
+.prettierignore
+eslint.config.js
+jest.config.js
+README.md
+.gitignore
+.git/
+
+# LWC configuration files
+**/jsconfig.json
+**/.eslintrc.json
+
+# LWC Jest tests
+**/__tests__/**

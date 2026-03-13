@@ -1,0 +1,39 @@
+<template>
+    <div class="slds-page-header slds-page-header_record-home">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-analytics" if:true={iconName}>
+                            <lightning-icon icon-name={iconName} alternative-text={title} size="medium"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                            <div class="slds-page-header__name-title">
+                                <h1>
+                                    <span class="slds-page-header__title slds-truncate" title={title}>{title}</span>
+                                </h1>
+                            </div>
+                        </div>
+                        <p class="slds-page-header__name-meta" if:true={subtitle}>{subtitle}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-page-header__col-actions" if:true={showRefreshButton}>
+                <div class="slds-page-header__controls">
+                    <div class="slds-page-header__control">
+                        <lightning-button
+                            variant="neutral"
+                            label="Refresh"
+                            title="Refresh Data"
+                            icon-name="utility:refresh"
+                            onclick={handleRefresh}
+                            disabled={isLoading}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
