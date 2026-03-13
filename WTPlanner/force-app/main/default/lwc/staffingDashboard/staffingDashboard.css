@@ -1,0 +1,138 @@
+/* KPI Tiles */
+.kpi-row {
+    flex-wrap: wrap;
+}
+
+.kpi-tile {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.kpi-tile:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-tile-success {
+    border-left: 4px solid #2e844a;
+}
+
+.kpi-tile-danger {
+    border-left: 4px solid #ea001e;
+}
+
+.kpi-tile-warning {
+    border-left: 4px solid #fe9339;
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #706e6b;
+    margin-bottom: 0.25rem;
+}
+
+.kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.kpi-success {
+    color: #2e844a;
+}
+
+.kpi-danger {
+    color: #ea001e;
+}
+
+.kpi-warning {
+    color: #fe9339;
+}
+
+/* Status text in datatable */
+.status-full-text {
+    color: #706e6b;
+}
+
+/* Clickable elements */
+.clickable {
+    cursor: pointer;
+}
+
+/* Overlap section */
+.overlap-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-top: 1px solid #e5e5e5;
+}
+
+.no-overlaps {
+    padding: 1rem;
+}
+
+/* Leaderboard */
+.leaderboard-section {
+    border-top: 1px solid #e5e5e5;
+    padding-top: 1rem;
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.leaderboard-row {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: #fafaf9;
+    border-radius: 0.25rem;
+}
+
+.leaderboard-rank {
+    width: 2.5rem;
+    flex-shrink: 0;
+}
+
+.rank-badge {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #706e6b;
+}
+
+.rank-top {
+    color: #2e844a;
+    font-size: 1rem;
+}
+
+.leaderboard-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.leaderboard-count {
+    display: flex;
+    align-items: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .kpi-row {
+        gap: 0.5rem;
+    }
+
+    .kpi-tile {
+        padding: 0.75rem;
+    }
+
+    .kpi-value {
+        font-size: 1.25rem;
+    }
+}

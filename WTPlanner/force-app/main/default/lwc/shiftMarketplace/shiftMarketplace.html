@@ -1,0 +1,165 @@
+<template>
+    <lightning-card title="Shift Marketplace" icon-name="standard:event">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+                variant="neutral"
+            ></lightning-button>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <!-- Summary Banner -->
+            <template if:true={sessionsNeedingStaffCount}>
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info slds-m-bottom_medium">
+                    <span class="slds-assistive-text">info</span>
+                    <h2>
+                        <lightning-icon icon-name="utility:people" size="x-small"></lightning-icon>
+                        <span class="slds-m-left_x-small">
+                            {sessionsNeedingStaffCount} session(s) need more staff
+                        </span>
+                    </h2>
+                </div>
+            </template>
+
+            <!-- Filters -->
+            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-grid_vertical-align-end">
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-combobox
+                        name="sessionType"
+                        label="Session Type"
+                        value={selectedSessionType}
+                        placeholder="Filter by session type"
+                        options={sessionTypeOptions}
+                        onchange={handleSessionTypeChange}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input
+                        type="checkbox"
+                        label="Hide fully staffed sessions"
+                        checked={hideFullyStaffed}
+                        onchange={handleHideFullyStaffedChange}
+                    ></lightning-input>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <!-- Sessions Grid -->
+            <template if:true={hasSessions}>
+                <div class="sessions-grid">
+                    <template for:each={filteredSessions} for:item="session">
+                        <div key={session.id} class={session.statusClass}>
+                            <!-- Session Card (clickable) -->
+                            <article class="slds-card clickable-card" data-id={session.id} onclick={handleSessionClick}>
+                                <div class="slds-card__header">
+                                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                        <div>
+                                            <h3 class="slds-card__header-title">
+                                                <span class="session-title">{session.name}</span>
+                                            </h3>
+                                        </div>
+                                        <div class="slds-grid slds-grid_vertical-align-center header-actions">
+                                            <lightning-badge label={session.sessionType} class="slds-m-right_small"></lightning-badge>
+                                            <span class="staffing-label">{session.staffingStatus}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-card__body slds-card__body_inner">
+                                    <div class="session-summary">
+                                        <div class="detail-row">
+                                            <lightning-icon icon-name="utility:location" size="x-small"></lightning-icon>
+                                            <span>{session.location}</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <lightning-icon icon-name="utility:people" size="x-small"></lightning-icon>
+                                            <span>{session.claimedShifts} / {session.totalShifts} shifts filled</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- View Shifts button -->
+                                    <template if:false={session.isFull}>
+                                        <lightning-button
+                                            label="View Shifts"
+                                            variant="brand"
+                                            icon-name="utility:chevrondown"
+                                            data-id={session.id}
+                                            onclick={handleSessionClick}
+                                            class="slds-m-top_small quick-assign-btn"
+                                        ></lightning-button>
+                                    </template>
+                                </div>
+
+                                <!-- Expanded Detail -->
+                                <template if:true={session.isExpanded}>
+                                    <div class="slds-card__body slds-card__body_inner expanded-detail">
+                                        <template if:true={session.description}>
+                                            <p class="slds-text-body_small slds-m-bottom_small">{session.description}</p>
+                                        </template>
+
+                                        <h4 class="slds-text-title_caps slds-m-bottom_x-small">Shifts</h4>
+                                        <div class="shifts-list">
+                                            <template for:each={session.shifts} for:item="shift">
+                                                <div key={shift.id} class="shift-row">
+                                                    <div class="shift-info">
+                                                        <lightning-icon
+                                                            icon-name={shift.statusIcon}
+                                                            size="x-small"
+                                                            variant={shift.statusVariant}
+                                                        ></lightning-icon>
+                                                        <span class="shift-time">{shift.startTime} - {shift.endTime}</span>
+                                                        <template if:true={shift.isClaimed}>
+                                                            <span class="assigned-name">{shift.assignedUserName}</span>
+                                                            <template if:true={shift.isMyShift}>
+                                                                <lightning-badge label="You" class="slds-m-left_xx-small"></lightning-badge>
+                                                            </template>
+                                                            <template if:true={shift.hasOverlap}>
+                                                                <lightning-badge label="Overlap" variant="warning" class="slds-m-left_xx-small"></lightning-badge>
+                                                            </template>
+                                                        </template>
+                                                    </div>
+                                                    <template if:false={shift.isClaimed}>
+                                                        <lightning-button
+                                                            label="Claim"
+                                                            variant="brand-outline"
+                                                            data-shift-id={shift.id}
+                                                            onclick={handleClaimShift}
+                                                        ></lightning-button>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- Expand indicator -->
+                                <div class="expand-indicator">
+                                    <lightning-icon
+                                        icon-name={session.expandIcon}
+                                        size="xx-small"
+                                    ></lightning-icon>
+                                </div>
+                            </article>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template if:false={hasSessions}>
+                <div class="slds-text-align_center slds-p-vertical_large">
+                    <lightning-icon icon-name="utility:success" size="large" variant="success"></lightning-icon>
+                    <p class="slds-m-top_small slds-text-heading_small">All sessions are fully staffed!</p>
+                    <p class="slds-m-top_x-small slds-text-color_weak">
+                        No sessions need additional staff at this time.
+                    </p>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

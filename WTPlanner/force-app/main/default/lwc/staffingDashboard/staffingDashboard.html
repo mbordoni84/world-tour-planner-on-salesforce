@@ -1,0 +1,168 @@
+<template>
+    <lightning-card title="Staffing Overview" icon-name="standard:dashboard">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+                variant="neutral"
+            ></lightning-button>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <!-- Loading -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+
+            <template if:false={isLoading}>
+                <!-- KPI Tiles -->
+                <div class="slds-grid slds-gutters slds-m-bottom_medium kpi-row">
+                    <div class="slds-col slds-size_1-of-5">
+                        <div class="kpi-tile">
+                            <div class="kpi-label">Total Shifts</div>
+                            <div class="kpi-value">{totalShiftsDisplay}</div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5">
+                        <div class="kpi-tile kpi-tile-success">
+                            <div class="kpi-label">Assigned</div>
+                            <div class="kpi-value kpi-success">{assignedDisplay}</div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5">
+                        <div class="kpi-tile kpi-tile-danger">
+                            <div class="kpi-label">Unassigned</div>
+                            <div class="kpi-value kpi-danger">{unassignedDisplay}</div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5">
+                        <div class="kpi-tile kpi-tile-warning clickable" onclick={handleOverlapTileClick}>
+                            <div class="kpi-label">Overlaps</div>
+                            <div class="kpi-value kpi-warning">{overlapsDisplay}</div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5">
+                        <div class="kpi-tile">
+                            <div class="kpi-label">Fill Rate</div>
+                            <div class={fillRateClass}>{fillRateFormatted}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-grid_vertical-align-end">
+                    <div class="slds-col slds-size_1-of-3">
+                        <lightning-combobox
+                            name="sessionType"
+                            label="Session Type"
+                            value={selectedSessionType}
+                            options={sessionTypeOptions}
+                            onchange={handleSessionTypeChange}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <lightning-combobox
+                            name="timeSlot"
+                            label="Time Slot"
+                            value={selectedTimeSlot}
+                            options={timeSlotOptions}
+                            onchange={handleTimeSlotChange}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <lightning-combobox
+                            name="status"
+                            label="Status"
+                            value={selectedStatus}
+                            options={statusOptions}
+                            onchange={handleStatusChange}
+                        ></lightning-combobox>
+                    </div>
+                </div>
+
+                <!-- Session Staffing Table -->
+                <template if:true={hasSessions}>
+                    <lightning-datatable
+                        key-field="id"
+                        data={filteredSessions}
+                        columns={sessionColumns}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortDirection}
+                        onsort={handleSort}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                </template>
+
+                <template if:false={hasSessions}>
+                    <div class="slds-text-align_center slds-p-vertical_large">
+                        <p class="slds-text-body_regular slds-text-color_weak">
+                            No sessions match the current filters.
+                        </p>
+                    </div>
+                </template>
+
+                <!-- Leaderboard -->
+                <template if:true={hasLeaderboard}>
+                    <div class="slds-m-top_large leaderboard-section">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">
+                            <lightning-icon icon-name="utility:trending" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                            Top Contributors
+                        </h3>
+                        <div class="leaderboard-list">
+                            <template for:each={leaderboard} for:item="entry">
+                                <div key={entry.userName} class="leaderboard-row">
+                                    <div class="leaderboard-rank">
+                                        <template if:true={entry.isTopThree}>
+                                            <span class="rank-badge rank-top">{entry.medal}</span>
+                                        </template>
+                                        <template if:false={entry.isTopThree}>
+                                            <span class="rank-badge">{entry.medal}</span>
+                                        </template>
+                                    </div>
+                                    <div class="leaderboard-name">{entry.userName}</div>
+                                    <div class="leaderboard-count">
+                                        <lightning-badge label={entry.shiftCount}></lightning-badge>
+                                        <span class="slds-text-body_small slds-text-color_weak slds-m-left_xx-small">shifts</span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Overlap Section -->
+                <div class="slds-m-top_large" data-id="overlap-section">
+                    <div class="overlap-header clickable" onclick={toggleOverlaps}>
+                        <lightning-icon
+                            icon-name={overlapToggleIcon}
+                            size="x-small"
+                            class="slds-m-right_x-small"
+                        ></lightning-icon>
+                        <h3 class="slds-text-heading_small">
+                            Overlap Details ({overlapsDisplay})
+                        </h3>
+                    </div>
+
+                    <template if:true={overlapExpanded}>
+                        <template if:true={hasOverlaps}>
+                            <lightning-datatable
+                                key-field="userName"
+                                data={overlaps}
+                                columns={overlapColumns}
+                                hide-checkbox-column
+                                class="slds-m-top_small"
+                            ></lightning-datatable>
+                        </template>
+                        <template if:false={hasOverlaps}>
+                            <div class="slds-text-align_center slds-p-vertical_medium no-overlaps">
+                                <lightning-icon icon-name="utility:success" size="small" variant="success"></lightning-icon>
+                                <p class="slds-m-top_x-small slds-text-color_weak">No overlapping shifts detected.</p>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
