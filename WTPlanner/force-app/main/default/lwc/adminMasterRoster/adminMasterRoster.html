@@ -1,0 +1,130 @@
+<template>
+    <lightning-card title="Master Roster" icon-name="standard:user">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+                variant="neutral"
+            ></lightning-button>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <!-- Tab Navigation -->
+            <lightning-tabset active-tab-value={activeTab} onselect={handleTabChange}>
+                <!-- By Person Tab -->
+                <lightning-tab label="By Person" value="byPerson">
+                    <template if:true={isLoading}>
+                        <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                    </template>
+
+                    <template if:true={hasPersonRoster}>
+                        <div class="roster-matrix-container">
+                            <div class="slds-scrollable_x">
+                                <table class="slds-table slds-table_bordered slds-table_fixed-layout roster-table">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th class="sticky-col" scope="col">
+                                                <div class="slds-truncate" title="User">User</div>
+                                            </th>
+                                            <template for:each={timeSlots} for:item="slot">
+                                                <th key={slot} scope="col">
+                                                    <div class="slds-truncate" title={slot}>{slot}</div>
+                                                </th>
+                                            </template>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={personRows} for:item="row">
+                                            <tr key={row.userName}>
+                                                <th class="sticky-col" scope="row">
+                                                    <div class="slds-truncate" title={row.userName}>{row.userName}</div>
+                                                </th>
+                                                <template for:each={row.slotCells} for:item="cell">
+                                                    <td key={cell.key}>
+                                                        <template if:true={cell.hasValue}>
+                                                            <span title={cell.tooltip}>
+                                                                <lightning-badge label={cell.value}></lightning-badge>
+                                                            </span>
+                                                        </template>
+                                                    </td>
+                                                </template>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template if:false={hasPersonRoster}>
+                        <div class="slds-text-align_center slds-p-vertical_large">
+                            <p>No roster data available.</p>
+                        </div>
+                    </template>
+                </lightning-tab>
+
+                <!-- By Shift Tab -->
+                <lightning-tab label="By Shift" value="byShift">
+                    <template if:true={isLoading}>
+                        <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                    </template>
+
+                    <template if:true={hasShiftRoster}>
+                        <div class="shifts-list">
+                            <template for:each={rosterByShift} for:item="shift">
+                                <div key={shift.id}>
+                                    <article class="slds-card shift-roster-card">
+                                        <div class="slds-card__header">
+                                            <div class="slds-media slds-media_center">
+                                                <div class="slds-media__body">
+                                                    <h3 class="slds-card__header-title">
+                                                        <span class="shift-title">{shift.sessionName}</span>
+                                                    </h3>
+                                                    <p class="slds-text-body_small slds-text-color_weak">
+                                                        {shift.sessionLocation} &bull; {shift.timeSlot}
+                                                    </p>
+                                                </div>
+                                                <div class="slds-no-flex">
+                                                    <lightning-badge label={shift.sessionType}></lightning-badge>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-card__body slds-card__body_inner">
+                                            <template if:true={shift.isAssigned}>
+                                                <div class="slds-m-top_small">
+                                                    <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">
+                                                        Assigned:
+                                                    </p>
+                                                    <div class="assigned-user">
+                                                        <lightning-icon icon-name="standard:avatar" size="x-small"></lightning-icon>
+                                                        <span>{shift.assignedUserName}</span>
+                                                        <template if:true={shift.hasOverlap}>
+                                                            <lightning-badge label="Overlap" variant="warning" icon-name="utility:warning"></lightning-badge>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </template>
+
+                                            <template if:false={shift.isAssigned}>
+                                                <div class="slds-text-align_center slds-m-top_small slds-text-color_weak">
+                                                    <p class="slds-text-body_small">Unassigned</p>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </article>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template if:false={hasShiftRoster}>
+                        <div class="slds-text-align_center slds-p-vertical_large">
+                            <p>No shifts available.</p>
+                        </div>
+                    </template>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

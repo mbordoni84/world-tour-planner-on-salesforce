@@ -13,11 +13,19 @@ public with sharing class AdminRosterController {
             List<Shift__c> assignedShifts = [
                 SELECT Id, User__c, User__r.Name,
                        Start_Time__c, End_Time__c,
-                       Session__r.Name, Session__r.Session_Type__r.Name
+                       Session__r.Name, Session__r.Session_Type__r.Name,
+                       Session__r.Location__c, Session__r.Min_Shifts__c, Session__r.Max_Shifts__c
                 FROM Shift__c
                 WHERE User__c != null
                 ORDER BY User__r.Name, Start_Time__c
             ];
+
+            // Build staffing counts per session
+            Map<Id, Integer> claimedBySession = new Map<Id, Integer>();
+            for (Shift__c shift : assignedShifts) {
+                Id sessId = shift.Session__c;
+                claimedBySession.put(sessId, (claimedBySession.containsKey(sessId) ? claimedBySession.get(sessId) : 0) + 1);
+            }
 
             Set<String> timeSlotSet = new Set<String>();
             for (Shift__c shift : allShifts) {
@@ -48,12 +56,27 @@ public with sharing class AdminRosterController {
                 }
 
                 Map<String, String> cellData = new Map<String, String>();
+                Map<String, String> cellTooltips = new Map<String, String>();
                 for (Shift__c shift : userShifts) {
                     String timeSlot = formatTimeSlot(shift.Start_Time__c, shift.End_Time__c);
                     cellData.put(timeSlot, shift.Session__r.Name);
+
+                    Integer claimed = claimedBySession.containsKey(shift.Session__c) ? claimedBySession.get(shift.Session__c) : 0;
+                    Integer minS = shift.Session__r.Min_Shifts__c != null ? (Integer)shift.Session__r.Min_Shifts__c : 1;
+                    Integer maxS = shift.Session__r.Max_Shifts__c != null ? (Integer)shift.Session__r.Max_Shifts__c : 5;
+                    String staffStatus = claimed < minS ? 'Needs Staff' : (claimed >= maxS ? 'Fully Staffed' : 'Min Reached');
+                    String loc = shift.Session__r.Location__c != null ? shift.Session__r.Location__c : '';
+
+                    String tooltip = shift.Session__r.Name +
+                        '\nType: ' + (shift.Session__r.Session_Type__r.Name != null ? shift.Session__r.Session_Type__r.Name : '') +
+                        '\nTime: ' + String.valueOf(shift.Start_Time__c) + ' - ' + String.valueOf(shift.End_Time__c) +
+                        '\nLocation: ' + loc +
+                        '\nStaffing: ' + claimed + '/' + minS + ' min (' + maxS + ' max)' +
+                        '\nStatus: ' + staffStatus;
+                    cellTooltips.put(timeSlot, tooltip);
                 }
 
-                rows.add(new RosterRow(usersMap.get(userId).Name, cellData));
+                rows.add(new RosterRow(usersMap.get(userId).Name, cellData, cellTooltips));
             }
 
             return new RosterByPersonData(timeSlots, rows);
@@ -103,10 +126,12 @@ public with sharing class AdminRosterController {
     public class RosterRow {
         @AuraEnabled public String userName {get; set;}
         @AuraEnabled public Map<String, String> cells {get; set;}
+        @AuraEnabled public Map<String, String> tooltips {get; set;}
 
-        public RosterRow(String userName, Map<String, String> cells) {
+        public RosterRow(String userName, Map<String, String> cells, Map<String, String> tooltips) {
             this.userName = userName;
             this.cells = cells;
+            this.tooltips = tooltips;
         }
     }
 
