@@ -21,5 +21,21 @@
     <tabs>My_Schedule</tabs>
     <tabs>Overlap_Dashboard</tabs>
     <tabs>Master_Roster</tabs>
+    <profileActionOverrides>
+        <actionName>Tab</actionName>
+        <content>Staffing_Home_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>standard-home</pageOrSobjectType>
+        <profile>Admin</profile>
+        <type>Flexipage</type>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>Tab</actionName>
+        <content>Staffing_Home_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>standard-home</pageOrSobjectType>
+        <profile>Standard</profile>
+        <type>Flexipage</type>
+    </profileActionOverrides>
     <uiType>Lightning</uiType>
 </CustomApplication>
