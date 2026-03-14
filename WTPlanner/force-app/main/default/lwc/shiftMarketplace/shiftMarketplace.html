@@ -24,25 +24,67 @@
             </template>
 
             <!-- Filters -->
-            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-grid_vertical-align-end">
-                <div class="slds-col slds-size_1-of-2">
-                    <lightning-combobox
-                        name="sessionType"
-                        label="Session Type"
-                        value={selectedSessionType}
-                        placeholder="Filter by session type"
-                        options={sessionTypeOptions}
-                        onchange={handleSessionTypeChange}
-                    ></lightning-combobox>
+            <div class="filter-bar slds-m-bottom_medium">
+                <div class="slds-grid slds-gutters slds-wrap">
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5 slds-m-bottom_small">
+                        <lightning-combobox
+                            name="sessionType"
+                            label="Session Type"
+                            value={selectedSessionType}
+                            options={sessionTypeOptions}
+                            onchange={handleSessionTypeChange}
+                            variant="label-stacked"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5 slds-m-bottom_small">
+                        <lightning-combobox
+                            name="location"
+                            label="Location"
+                            value={selectedLocation}
+                            options={locationOptions}
+                            onchange={handleLocationChange}
+                            variant="label-stacked"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5 slds-m-bottom_small">
+                        <lightning-combobox
+                            name="status"
+                            label="Status"
+                            value={selectedStatus}
+                            options={statusOptions}
+                            onchange={handleStatusChange}
+                            variant="label-stacked"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5 slds-m-bottom_small">
+                        <lightning-input
+                            label="Search Session"
+                            value={searchText}
+                            onchange={handleSearchChange}
+                            placeholder="Name..."
+                            type="search"
+                            variant="label-stacked"
+                        ></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5 slds-m-bottom_small filter-checkbox-col">
+                        <lightning-input
+                            type="checkbox"
+                            label="Hide fully staffed"
+                            checked={hideFullyStaffed}
+                            onchange={handleHideFullyStaffedChange}
+                        ></lightning-input>
+                    </div>
                 </div>
-                <div class="slds-col slds-size_1-of-2">
-                    <lightning-input
-                        type="checkbox"
-                        label="Hide fully staffed sessions"
-                        checked={hideFullyStaffed}
-                        onchange={handleHideFullyStaffedChange}
-                    ></lightning-input>
-                </div>
+                <template if:true={hasActiveFilters}>
+                    <div class="slds-m-top_x-small">
+                        <lightning-button
+                            label="Clear Filters"
+                            icon-name="utility:close"
+                            variant="base"
+                            onclick={handleClearFilters}
+                        ></lightning-button>
+                    </div>
+                </template>
             </div>
 
             <!-- Loading Spinner -->
@@ -89,7 +131,7 @@
                                             variant="brand"
                                             icon-name="utility:chevrondown"
                                             data-id={session.id}
-                                            onclick={handleSessionClick}
+                                            onclick={handleViewShifts}
                                             class="slds-m-top_small quick-assign-btn"
                                         ></lightning-button>
                                     </template>
@@ -156,7 +198,7 @@
                     <lightning-icon icon-name="utility:success" size="large" variant="success"></lightning-icon>
                     <p class="slds-m-top_small slds-text-heading_small">All sessions are fully staffed!</p>
                     <p class="slds-m-top_x-small slds-text-color_weak">
-                        No sessions need additional staff at this time.
+                        No sessions match the current filters.
                     </p>
                 </div>
             </template>

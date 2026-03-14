@@ -1,3 +1,15 @@
+/* Filter Bar */
+.filter-bar {
+    background: #fafaf9;
+    border: 1px solid #e5e5e5;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+}
+
+.overlap-icon {
+    vertical-align: middle;
+}
+
 /* By Person Matrix View */
 .roster-matrix-container {
     margin-top: 1rem;
@@ -120,6 +132,89 @@
 .status-full .status-badge {
     background-color: #f3f2f2;
     color: #706e6b;
+}
+
+/* Popover */
+.popover-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.popover-content {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    padding: 0.75rem;
+    min-width: 220px;
+    z-index: 9999;
+    white-space: nowrap;
+}
+
+.popover-content::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #ffffff;
+}
+
+.popover-content::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: #d8dde6;
+}
+
+.popover-container:hover .popover-content {
+    display: block;
+}
+
+.popover-header {
+    font-weight: 700;
+    font-size: 0.8125rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.375rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.popover-row {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.125rem 0;
+}
+
+.popover-label {
+    font-weight: 600;
+    color: #706e6b;
+    min-width: 60px;
+}
+
+.popover-status-danger {
+    color: #ea001e;
+    font-weight: 600;
+}
+
+.popover-status-success {
+    color: #2e844a;
+    font-weight: 600;
+}
+
+.popover-status-muted {
+    color: #706e6b;
+    font-weight: 600;
 }
 
 /* Mobile Responsive */

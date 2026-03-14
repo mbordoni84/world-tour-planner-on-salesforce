@@ -1,0 +1,144 @@
+/* Filter Bar */
+.filter-bar {
+    background: #fafaf9;
+    border: 1px solid #e5e5e5;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+}
+
+.filter-checkbox-col {
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 0.5rem;
+}
+
+.sessions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.session-card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.clickable-card {
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.clickable-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.session-title {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.header-actions {
+    gap: 0.5rem;
+}
+
+.staffing-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.session-summary {
+    padding: 0.25rem 0;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.quick-assign-btn {
+    display: block;
+}
+
+/* Expanded detail */
+.expanded-detail {
+    border-top: 1px solid #e5e5e5;
+    padding-top: 0.75rem;
+}
+
+.shifts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.shift-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background: #fafaf9;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.shift-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.shift-time {
+    font-weight: 500;
+}
+
+.assigned-name {
+    color: #706e6b;
+}
+
+.expand-indicator {
+    display: flex;
+    justify-content: center;
+    padding: 0.25rem;
+    border-top: 1px solid #f3f2f2;
+}
+
+/* Status styles */
+.status-needs-staff {
+    border-left: 4px solid #ea001e;
+}
+
+.status-needs-staff .staffing-label {
+    color: #ea001e;
+}
+
+.status-open {
+    border-left: 4px solid #2e844a;
+}
+
+.status-open .staffing-label {
+    color: #2e844a;
+}
+
+.status-full {
+    border-left: 4px solid #706e6b;
+    opacity: 0.7;
+}
+
+.status-full .staffing-label {
+    color: #706e6b;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .shift-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}

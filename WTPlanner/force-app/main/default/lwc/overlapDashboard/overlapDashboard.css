@@ -1,0 +1,22 @@
+/* Filter Bar */
+.filter-bar {
+    background: #fafaf9;
+    border: 1px solid #e5e5e5;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.empty-state {
+    padding: 3rem 1rem;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    .table-container {
+        font-size: 0.875rem;
+    }
+}

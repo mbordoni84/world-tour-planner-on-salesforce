@@ -1,0 +1,119 @@
+<template>
+    <lightning-card title="Overlap Dashboard" icon-name="standard:alert">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+                variant="neutral"
+            ></lightning-button>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <!-- Summary Banner -->
+            <template if:true={totalOverlapCount}>
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning slds-m-bottom_medium">
+                    <span class="slds-assistive-text">warning</span>
+                    <h2>
+                        <lightning-icon icon-name="utility:warning" size="small" variant="warning"></lightning-icon>
+                        <span class="slds-m-left_x-small">
+                            {totalOverlapCount} shift overlap(s) detected
+                        </span>
+                    </h2>
+                </div>
+            </template>
+
+            <!-- Filter Bar -->
+            <template if:true={totalOverlapCount}>
+                <div class="filter-bar slds-m-bottom_medium">
+                    <div class="slds-grid slds-gutters slds-wrap">
+                        <div class="slds-col slds-size_1-of-3 slds-m-bottom_small">
+                            <lightning-input
+                                label="Search User"
+                                value={filterUser}
+                                onchange={handleFilterUser}
+                                placeholder="Name..."
+                                type="search"
+                                variant="label-stacked"
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 slds-m-bottom_small">
+                            <lightning-combobox
+                                name="sessionType"
+                                label="Session Type"
+                                value={filterSessionType}
+                                options={sessionTypeOptions}
+                                onchange={handleFilterSessionType}
+                                variant="label-stacked"
+                            ></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 slds-m-bottom_small">
+                            <lightning-combobox
+                                name="session"
+                                label="Session"
+                                value={filterSession}
+                                options={sessionOptions}
+                                onchange={handleFilterSession}
+                                variant="label-stacked"
+                            ></lightning-combobox>
+                        </div>
+                    </div>
+                    <template if:true={hasActiveFilters}>
+                        <div class="slds-m-top_x-small">
+                            <lightning-button
+                                label="Clear Filters"
+                                icon-name="utility:close"
+                                variant="base"
+                                onclick={handleClearFilters}
+                            ></lightning-button>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Loading Spinner -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <!-- Overlaps Table -->
+            <template if:true={hasOverlaps}>
+                <div class="table-container">
+                    <lightning-datatable
+                        key-field="id"
+                        data={filteredOverlaps}
+                        columns={columns}
+                        hide-checkbox-column
+                        onrowaction={handleRowAction}
+                    ></lightning-datatable>
+                </div>
+
+                <div class="slds-m-top_medium slds-p-around_small slds-box slds-theme_shade">
+                    <p class="slds-text-body_small">
+                        <lightning-icon icon-name="utility:info" size="x-small"></lightning-icon>
+                        <strong>Note:</strong> Overlapping shifts occur when you are assigned to multiple shifts
+                        with conflicting times. Drop one of the conflicting shifts to resolve the overlap.
+                    </p>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template if:false={hasOverlaps}>
+                <template if:true={hasActiveFilters}>
+                    <div class="slds-text-align_center slds-p-vertical_large">
+                        <p class="slds-text-color_weak">No overlaps match the current filters.</p>
+                    </div>
+                </template>
+                <template if:false={hasActiveFilters}>
+                    <div class="slds-text-align_center slds-p-vertical_large empty-state">
+                        <lightning-icon icon-name="utility:success" size="large" variant="success"></lightning-icon>
+                        <p class="slds-m-top_small slds-text-heading_small">No Overlaps Detected</p>
+                        <p class="slds-m-top_x-small slds-text-color_weak">
+                            Your shift schedule is conflict-free!
+                        </p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

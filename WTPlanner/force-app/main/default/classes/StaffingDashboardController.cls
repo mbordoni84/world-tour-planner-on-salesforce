@@ -234,6 +234,11 @@ public with sharing class StaffingDashboardController {
         }
     }
 
+    private static String formatTimeVal(Time t) {
+        return String.valueOf(t.hour()).leftPad(2, '0') + ':' +
+               String.valueOf(t.minute()).leftPad(2, '0');
+    }
+
     public class OverlapPair {
         @AuraEnabled public String userName {get; set;}
         @AuraEnabled public String session1 {get; set;}
@@ -244,9 +249,9 @@ public with sharing class StaffingDashboardController {
         public OverlapPair(Shift__c shift1, Shift__c shift2) {
             this.userName = shift1.User__r.Name;
             this.session1 = shift1.Session__r.Name;
-            this.time1 = String.valueOf(shift1.Start_Time__c) + ' - ' + String.valueOf(shift1.End_Time__c);
+            this.time1 = formatTimeVal(shift1.Start_Time__c) + ' - ' + formatTimeVal(shift1.End_Time__c);
             this.session2 = shift2.Session__r.Name;
-            this.time2 = String.valueOf(shift2.Start_Time__c) + ' - ' + String.valueOf(shift2.End_Time__c);
+            this.time2 = formatTimeVal(shift2.Start_Time__c) + ' - ' + formatTimeVal(shift2.End_Time__c);
         }
     }
 }

@@ -2,16 +2,16 @@
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Home page with Staffing Dashboard</description>
     <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>staffingDashboard</componentName>
+                <identifier>staffingDashboard1</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>top</name>
         <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentName>c:staffingDashboard</componentName>
-                <identifier>staffingDashboard1</identifier>
-            </componentInstance>
-        </itemInstances>
         <name>left</name>
         <type>Region</type>
     </flexiPageRegions>

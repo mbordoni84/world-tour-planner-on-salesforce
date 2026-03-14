@@ -10,6 +10,82 @@
         </div>
 
         <div class="slds-p-around_medium">
+            <!-- Filter Bar -->
+            <div class="filter-bar slds-m-bottom_medium">
+                <div class="slds-grid slds-gutters slds-wrap">
+                    <div class="slds-col slds-size_1-of-3 slds-medium-size_1-of-6 slds-m-bottom_small">
+                        <lightning-combobox
+                            name="sessionType"
+                            label="Session Type"
+                            value={filterSessionType}
+                            options={sessionTypeOptions}
+                            onchange={handleFilterSessionType}
+                            variant="label-stacked"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-medium-size_1-of-6 slds-m-bottom_small">
+                        <lightning-combobox
+                            name="session"
+                            label="Session"
+                            value={filterSession}
+                            options={sessionOptions}
+                            onchange={handleFilterSession}
+                            variant="label-stacked"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-medium-size_1-of-6 slds-m-bottom_small">
+                        <lightning-combobox
+                            name="timeSlot"
+                            label="Time Slot"
+                            value={filterTimeSlot}
+                            options={timeSlotFilterOptions}
+                            onchange={handleFilterTimeSlot}
+                            variant="label-stacked"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-medium-size_1-of-6 slds-m-bottom_small">
+                        <lightning-combobox
+                            name="minStaffing"
+                            label="Min Staffing Reached"
+                            value={filterMinStaffing}
+                            options={minStaffingOptions}
+                            onchange={handleFilterMinStaffing}
+                            variant="label-stacked"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-medium-size_1-of-6 slds-m-bottom_small">
+                        <lightning-combobox
+                            name="overlaps"
+                            label="Has Overlaps"
+                            value={filterOverlaps}
+                            options={overlapOptions}
+                            onchange={handleFilterOverlaps}
+                            variant="label-stacked"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-medium-size_1-of-6 slds-m-bottom_small">
+                        <lightning-input
+                            label="Search User"
+                            value={filterUser}
+                            onchange={handleFilterUser}
+                            placeholder="Name..."
+                            type="search"
+                            variant="label-stacked"
+                        ></lightning-input>
+                    </div>
+                </div>
+                <template if:true={hasActiveFilters}>
+                    <div class="slds-m-top_x-small">
+                        <lightning-button
+                            label="Clear Filters"
+                            icon-name="utility:close"
+                            variant="base"
+                            onclick={handleClearFilters}
+                        ></lightning-button>
+                    </div>
+                </template>
+            </div>
+
             <!-- Tab Navigation -->
             <lightning-tabset active-tab-value={activeTab} onselect={handleTabChange}>
                 <!-- By Person Tab -->
@@ -43,9 +119,40 @@
                                                 <template for:each={row.slotCells} for:item="cell">
                                                     <td key={cell.key}>
                                                         <template if:true={cell.hasValue}>
-                                                            <span title={cell.tooltip}>
+                                                            <div class="popover-container">
                                                                 <lightning-badge label={cell.value}></lightning-badge>
-                                                            </span>
+                                                                <template if:true={cell.hasOverlap}>
+                                                                    <lightning-icon
+                                                                        icon-name="utility:warning"
+                                                                        size="xx-small"
+                                                                        variant="warning"
+                                                                        class="slds-m-left_xx-small overlap-icon"
+                                                                    ></lightning-icon>
+                                                                </template>
+                                                                <div class="popover-content" role="tooltip">
+                                                                    <div class="popover-header">{cell.value}</div>
+                                                                    <div class="popover-row">
+                                                                        <span class="popover-label">Type:</span>
+                                                                        <span>{cell.sessionType}</span>
+                                                                    </div>
+                                                                    <div class="popover-row">
+                                                                        <span class="popover-label">Time:</span>
+                                                                        <span>{cell.timeRange}</span>
+                                                                    </div>
+                                                                    <div class="popover-row">
+                                                                        <span class="popover-label">Location:</span>
+                                                                        <span>{cell.location}</span>
+                                                                    </div>
+                                                                    <div class="popover-row">
+                                                                        <span class="popover-label">Staffing:</span>
+                                                                        <span>{cell.staffingLabel}</span>
+                                                                    </div>
+                                                                    <div class="popover-row">
+                                                                        <span class="popover-label">Status:</span>
+                                                                        <span class={cell.statusClass}>{cell.status}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </template>
                                                     </td>
                                                 </template>
@@ -59,7 +166,7 @@
 
                     <template if:false={hasPersonRoster}>
                         <div class="slds-text-align_center slds-p-vertical_large">
-                            <p>No roster data available.</p>
+                            <p class="slds-text-color_weak">No roster data matches the current filters.</p>
                         </div>
                     </template>
                 </lightning-tab>
@@ -72,7 +179,7 @@
 
                     <template if:true={hasShiftRoster}>
                         <div class="shifts-list">
-                            <template for:each={rosterByShift} for:item="shift">
+                            <template for:each={filteredShifts} for:item="shift">
                                 <div key={shift.id}>
                                     <article class="slds-card shift-roster-card">
                                         <div class="slds-card__header">
@@ -100,7 +207,7 @@
                                                         <lightning-icon icon-name="standard:avatar" size="x-small"></lightning-icon>
                                                         <span>{shift.assignedUserName}</span>
                                                         <template if:true={shift.hasOverlap}>
-                                                            <lightning-badge label="Overlap" variant="warning" icon-name="utility:warning"></lightning-badge>
+                                                            <lightning-badge label="Overlap" variant="warning"></lightning-badge>
                                                         </template>
                                                     </div>
                                                 </div>
@@ -120,7 +227,7 @@
 
                     <template if:false={hasShiftRoster}>
                         <div class="slds-text-align_center slds-p-vertical_large">
-                            <p>No shifts available.</p>
+                            <p class="slds-text-color_weak">No shifts match the current filters.</p>
                         </div>
                     </template>
                 </lightning-tab>

@@ -1,36 +1,193 @@
 import { LightningElement, wire, track } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import getRosterByPerson from '@salesforce/apex/AdminRosterController.getRosterByPerson';
-import getRosterByShift from '@salesforce/apex/AdminRosterController.getRosterByShift';
+import getRosterData from '@salesforce/apex/AdminRosterController.getRosterData';
 
 export default class AdminMasterRoster extends LightningElement {
     @track activeTab = 'byPerson';
-    @track rosterByPerson = null;
-    @track rosterByShift = [];
     @track isLoading = false;
 
-    wiredRosterByPersonResult;
-    wiredRosterByShiftResult;
+    // Raw data from Apex
+    allRows = [];
+    allShifts = [];
+    allTimeSlots = [];
 
-    @wire(getRosterByPerson)
-    wiredPersonRoster(result) {
-        this.wiredRosterByPersonResult = result;
+    // Filter values
+    @track filterSessionType = '';
+    @track filterSession = '';
+    @track filterMinStaffing = '';
+    @track filterOverlaps = '';
+    @track filterTimeSlot = '';
+    @track filterUser = '';
+
+    // Filter options (built from data)
+    @track sessionTypeOptions = [{ label: 'All Types', value: '' }];
+    @track sessionOptions = [{ label: 'All Sessions', value: '' }];
+    @track timeSlotFilterOptions = [{ label: 'All Time Slots', value: '' }];
+
+    minStaffingOptions = [
+        { label: 'All', value: '' },
+        { label: 'Yes - Min reached', value: 'yes' },
+        { label: 'No - Needs staff', value: 'no' }
+    ];
+
+    overlapOptions = [
+        { label: 'All', value: '' },
+        { label: 'Yes - Has overlaps', value: 'yes' },
+        { label: 'No - No overlaps', value: 'no' }
+    ];
+
+    wiredResult;
+
+    @wire(getRosterData)
+    wiredRoster(result) {
+        this.wiredResult = result;
         if (result.data) {
-            this.rosterByPerson = result.data;
+            this.allRows = result.data.rows || [];
+            this.allShifts = result.data.shifts || [];
+            this.allTimeSlots = result.data.timeSlots || [];
+
+            // Build filter options
+            this.sessionTypeOptions = [{ label: 'All Types', value: '' }];
+            (result.data.sessionTypes || []).forEach(t => {
+                this.sessionTypeOptions.push({ label: t, value: t });
+            });
+
+            this.sessionOptions = [{ label: 'All Sessions', value: '' }];
+            (result.data.sessionNames || []).forEach(n => {
+                this.sessionOptions.push({ label: n, value: n });
+            });
+
+            this.timeSlotFilterOptions = [{ label: 'All Time Slots', value: '' }];
+            (result.data.timeSlotOptions || []).forEach(s => {
+                this.timeSlotFilterOptions.push({ label: s, value: s });
+            });
         } else if (result.error) {
-            this.showToast('Error', 'Error loading roster by person', 'error');
+            this.showToast('Error', 'Error loading roster data', 'error');
         }
     }
 
-    @wire(getRosterByShift)
-    wiredShiftRoster(result) {
-        this.wiredRosterByShiftResult = result;
-        if (result.data) {
-            this.rosterByShift = result.data;
-        } else if (result.error) {
-            this.showToast('Error', 'Error loading roster by shift', 'error');
+    // Filter handlers
+    handleFilterSessionType(event) {
+        this.filterSessionType = event.detail.value;
+    }
+
+    handleFilterSession(event) {
+        this.filterSession = event.detail.value;
+    }
+
+    handleFilterMinStaffing(event) {
+        this.filterMinStaffing = event.detail.value;
+    }
+
+    handleFilterOverlaps(event) {
+        this.filterOverlaps = event.detail.value;
+    }
+
+    handleFilterTimeSlot(event) {
+        this.filterTimeSlot = event.detail.value;
+    }
+
+    handleFilterUser(event) {
+        this.filterUser = event.target.value;
+    }
+
+    handleClearFilters() {
+        this.filterSessionType = '';
+        this.filterSession = '';
+        this.filterMinStaffing = '';
+        this.filterOverlaps = '';
+        this.filterTimeSlot = '';
+        this.filterUser = '';
+    }
+
+    // Cell-level filter check — does this cell detail pass the current filters?
+    cellPassesFilter(detail) {
+        if (!detail) return false;
+        if (this.filterSessionType && detail.sessionType !== this.filterSessionType) return false;
+        if (this.filterSession && detail.sessionName !== this.filterSession) return false;
+        if (this.filterMinStaffing === 'yes' && !detail.minReached) return false;
+        if (this.filterMinStaffing === 'no' && detail.minReached) return false;
+        if (this.filterOverlaps === 'yes' && !detail.sessionHasOverlap) return false;
+        if (this.filterOverlaps === 'no' && detail.sessionHasOverlap) return false;
+        return true;
+    }
+
+    // Shift-level filter check for By Shift tab
+    shiftPassesFilter(shift) {
+        if (this.filterSessionType && shift.sessionType !== this.filterSessionType) return false;
+        if (this.filterSession && shift.sessionName !== this.filterSession) return false;
+        if (this.filterTimeSlot && shift.timeSlot !== this.filterTimeSlot) return false;
+        if (this.filterMinStaffing === 'yes' && !shift.minReached) return false;
+        if (this.filterMinStaffing === 'no' && shift.minReached) return false;
+        if (this.filterOverlaps === 'yes' && !shift.sessionHasOverlap) return false;
+        if (this.filterOverlaps === 'no' && shift.sessionHasOverlap) return false;
+        if (this.filterUser) {
+            const search = this.filterUser.toLowerCase();
+            const name = (shift.assignedUserName || '').toLowerCase();
+            if (!name.includes(search)) return false;
         }
+        return true;
+    }
+
+    // Computed: filtered time slots for By Person (hide columns if time slot filter active)
+    get timeSlots() {
+        if (this.filterTimeSlot) {
+            return this.allTimeSlots.filter(s => s === this.filterTimeSlot);
+        }
+        return this.allTimeSlots;
+    }
+
+    // Computed: filtered person rows
+    get personRows() {
+        const slots = this.timeSlots;
+        const userSearch = this.filterUser ? this.filterUser.toLowerCase() : '';
+
+        const result = [];
+        for (const row of this.allRows) {
+            // User name filter
+            if (userSearch && !row.userName.toLowerCase().includes(userSearch)) continue;
+
+            const slotCells = slots.map(slot => {
+                const hasRawValue = !!(row.cells && row.cells[slot]);
+                const detail = row.cellDetails ? row.cellDetails[slot] : null;
+                const passesFilter = hasRawValue && this.cellPassesFilter(detail);
+
+                let statusClass = '';
+                if (detail && detail.status === 'Needs Staff') {
+                    statusClass = 'popover-status-danger';
+                } else if (detail && detail.status === 'Fully Staffed') {
+                    statusClass = 'popover-status-muted';
+                } else if (detail) {
+                    statusClass = 'popover-status-success';
+                }
+
+                return {
+                    key: row.userName + '-' + slot,
+                    slot,
+                    value: passesFilter ? row.cells[slot] : null,
+                    hasValue: passesFilter,
+                    sessionType: detail ? detail.sessionType : '',
+                    timeRange: detail ? detail.timeRange : '',
+                    location: detail ? detail.location : '',
+                    staffingLabel: detail ? detail.staffingLabel : '',
+                    status: detail ? detail.status : '',
+                    statusClass,
+                    hasOverlap: detail ? detail.hasOverlap : false
+                };
+            });
+
+            // Only include row if at least one cell is visible
+            if (slotCells.some(c => c.hasValue)) {
+                result.push({ ...row, slotCells });
+            }
+        }
+        return result;
+    }
+
+    // Computed: filtered shifts for By Shift tab
+    get filteredShifts() {
+        return this.allShifts.filter(s => this.shiftPassesFilter(s));
     }
 
     handleTabChange(event) {
@@ -39,10 +196,7 @@ export default class AdminMasterRoster extends LightningElement {
 
     handleRefresh() {
         this.isLoading = true;
-        Promise.all([
-            refreshApex(this.wiredRosterByPersonResult),
-            refreshApex(this.wiredRosterByShiftResult)
-        ]).finally(() => {
+        refreshApex(this.wiredResult).finally(() => {
             this.isLoading = false;
         });
     }
@@ -51,38 +205,17 @@ export default class AdminMasterRoster extends LightningElement {
         this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
     }
 
-    get isPersonTabActive() {
-        return this.activeTab === 'byPerson';
-    }
-
-    get isShiftTabActive() {
-        return this.activeTab === 'byShift';
-    }
-
     get hasPersonRoster() {
-        return this.rosterByPerson?.rows?.length > 0;
+        return this.personRows.length > 0;
     }
 
     get hasShiftRoster() {
-        return this.rosterByShift.length > 0;
+        return this.filteredShifts.length > 0;
     }
 
-    get timeSlots() {
-        return this.rosterByPerson?.timeSlots || [];
-    }
-
-    get personRows() {
-        const rows = this.rosterByPerson?.rows || [];
-        const slots = this.timeSlots;
-        return rows.map(row => ({
-            ...row,
-            slotCells: slots.map(slot => ({
-                key: row.userName + '-' + slot,
-                slot: slot,
-                value: row.cells ? row.cells[slot] : null,
-                tooltip: row.tooltips ? row.tooltips[slot] : null,
-                hasValue: !!(row.cells && row.cells[slot])
-            }))
-        }));
+    get hasActiveFilters() {
+        return !!(this.filterSessionType || this.filterSession ||
+            this.filterMinStaffing || this.filterOverlaps ||
+            this.filterTimeSlot || this.filterUser);
     }
 }
