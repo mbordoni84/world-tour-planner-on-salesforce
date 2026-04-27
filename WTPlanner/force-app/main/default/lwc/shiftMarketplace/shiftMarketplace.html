@@ -115,12 +115,16 @@
                                 <div class="slds-card__body slds-card__body_inner">
                                     <div class="session-summary">
                                         <div class="detail-row">
+                                            <lightning-icon icon-name="utility:type_tool" size="x-small"></lightning-icon>
+                                            <span>{session.sessionType}</span>
+                                        </div>
+                                        <div class="detail-row">
                                             <lightning-icon icon-name="utility:location" size="x-small"></lightning-icon>
                                             <span>{session.location}</span>
                                         </div>
                                         <div class="detail-row">
                                             <lightning-icon icon-name="utility:people" size="x-small"></lightning-icon>
-                                            <span>{session.claimedShifts} / {session.totalShifts} shifts filled</span>
+                                            <span>{session.claimedShifts} / {session.totalShifts} shifts filled — {session.staffingStatus}</span>
                                         </div>
                                     </div>
 
@@ -155,24 +159,59 @@
                                                             variant={shift.statusVariant}
                                                         ></lightning-icon>
                                                         <span class="shift-time">{shift.startTime} - {shift.endTime}</span>
-                                                        <template if:true={shift.isClaimed}>
-                                                            <span class="assigned-name">{shift.assignedUserName}</span>
-                                                            <template if:true={shift.isMyShift}>
-                                                                <lightning-badge label="You" class="slds-m-left_xx-small"></lightning-badge>
-                                                            </template>
-                                                            <template if:true={shift.hasOverlap}>
-                                                                <lightning-badge label="Overlap" variant="warning" class="slds-m-left_xx-small"></lightning-badge>
+                                                        <template if:false={isAdmin}>
+                                                            <template if:true={shift.isClaimed}>
+                                                                <span class="assigned-name">{shift.assignedUserName}</span>
+                                                                <template if:true={shift.isMyShift}>
+                                                                    <lightning-badge label="You" class="slds-m-left_xx-small"></lightning-badge>
+                                                                </template>
+                                                                <template if:true={shift.hasOverlap}>
+                                                                    <lightning-badge label="Overlap" variant="warning" class="slds-m-left_xx-small"></lightning-badge>
+                                                                </template>
                                                             </template>
                                                         </template>
                                                     </div>
-                                                    <template if:false={shift.isClaimed}>
-                                                        <lightning-button
-                                                            label="Claim"
-                                                            variant="brand-outline"
-                                                            data-shift-id={shift.id}
-                                                            onclick={handleClaimShift}
-                                                        ></lightning-button>
-                                                    </template>
+                                                    <div class="shift-actions">
+                                                        <template if:true={isAdmin}>
+                                                            <div class="admin-assign-controls">
+                                                                <lightning-combobox
+                                                                    name="assignUser"
+                                                                    variant="label-hidden"
+                                                                    value={shift.assignedUserId}
+                                                                    options={shift.userOptions}
+                                                                    data-shift-id={shift.id}
+                                                                    data-current-user={shift.assignedUserId}
+                                                                    onchange={handleAdminAssign}
+                                                                    dropdown-alignment="auto"
+                                                                    class="admin-user-combobox"
+                                                                ></lightning-combobox>
+                                                                <template if:true={shift.isClaimed}>
+                                                                    <lightning-button-icon
+                                                                        icon-name="utility:close"
+                                                                        variant="bare"
+                                                                        alternative-text="Remove user"
+                                                                        data-shift-id={shift.id}
+                                                                        onclick={handleAdminUnassign}
+                                                                        class="remove-btn"
+                                                                        title="Remove user"
+                                                                    ></lightning-button-icon>
+                                                                </template>
+                                                                <template if:true={shift.hasOverlap}>
+                                                                    <lightning-badge label="Overlap" variant="warning" class="slds-m-left_xx-small"></lightning-badge>
+                                                                </template>
+                                                            </div>
+                                                        </template>
+                                                        <template if:false={isAdmin}>
+                                                            <template if:false={shift.isClaimed}>
+                                                                <lightning-button
+                                                                    label="Claim"
+                                                                    variant="brand-outline"
+                                                                    data-shift-id={shift.id}
+                                                                    onclick={handleClaimShift}
+                                                                ></lightning-button>
+                                                            </template>
+                                                        </template>
+                                                    </div>
                                                 </div>
                                             </template>
                                         </div>

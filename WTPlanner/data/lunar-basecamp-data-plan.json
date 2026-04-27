@@ -1,0 +1,32 @@
+[
+  {
+    "sobject": "Lunar_Explorer__c",
+    "saveRefs": true,
+    "resolveRefs": false,
+    "files": ["Lunar_Explorer__c.json"]
+  },
+  {
+    "sobject": "Gear_Item__c",
+    "saveRefs": true,
+    "resolveRefs": false,
+    "files": ["Gear_Item__c.json"]
+  },
+  {
+    "sobject": "Expedition_Booking__c",
+    "saveRefs": true,
+    "resolveRefs": true,
+    "files": ["Expedition_Booking__c.json"]
+  },
+  {
+    "sobject": "Safety_Certification__c",
+    "saveRefs": false,
+    "resolveRefs": true,
+    "files": ["Safety_Certification__c.json"]
+  },
+  {
+    "sobject": "Expedition_Gear__c",
+    "saveRefs": false,
+    "resolveRefs": true,
+    "files": ["Expedition_Gear__c.json"]
+  }
+]

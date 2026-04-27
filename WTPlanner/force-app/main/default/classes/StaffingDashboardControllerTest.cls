@@ -96,9 +96,9 @@ private class StaffingDashboardControllerTest {
         System.assertEquals('Needs Staff', statusByName.get('Booth Session'),
             'Booth session should need staff');
 
-        // Keynote: 1 claimed, min 1 → Min Reached
-        System.assertEquals('Min Reached', statusByName.get('Keynote Session'),
-            'Keynote session should have min reached');
+        // Keynote: 1 shift in 1 slot, 1 claimed, min 1 → all slots full
+        System.assertEquals('Fully Staffed', statusByName.get('Keynote Session'),
+            'Keynote session should be fully staffed');
     }
 
     @isTest

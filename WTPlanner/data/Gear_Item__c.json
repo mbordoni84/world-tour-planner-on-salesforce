@@ -1,0 +1,199 @@
+{
+  "records": [
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem1"
+      },
+      "Item_Name__c": "Apollo Heritage Pressure Suit X7",
+      "Category__c": "Pressure Suit",
+      "Serial_Number__c": "LBO-2024-001",
+      "Maintenance_Due_Date__c": "2026-04-15",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 5000.00,
+      "Purchase_Price__c": 250000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem2"
+      },
+      "Item_Name__c": "Apollo Heritage Pressure Suit X8",
+      "Category__c": "Pressure Suit",
+      "Serial_Number__c": "LBO-2024-002",
+      "Maintenance_Due_Date__c": "2026-05-20",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 5000.00,
+      "Purchase_Price__c": 250000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem3"
+      },
+      "Item_Name__c": "Apollo Heritage Pressure Suit X9",
+      "Category__c": "Pressure Suit",
+      "Serial_Number__c": "LBO-2024-003",
+      "Maintenance_Due_Date__c": "2026-03-10",
+      "Status__c": "Rented",
+      "Daily_Rental_Rate__c": 5000.00,
+      "Purchase_Price__c": 250000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem4"
+      },
+      "Item_Name__c": "CraterGrip Magnetic Boots - Size 10",
+      "Category__c": "Boots",
+      "Serial_Number__c": "CGM-2025-047",
+      "Maintenance_Due_Date__c": "2026-06-01",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 800.00,
+      "Purchase_Price__c": 15000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem5"
+      },
+      "Item_Name__c": "CraterGrip Magnetic Boots - Size 9",
+      "Category__c": "Boots",
+      "Serial_Number__c": "CGM-2025-048",
+      "Maintenance_Due_Date__c": "2026-06-05",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 800.00,
+      "Purchase_Price__c": 15000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem6"
+      },
+      "Item_Name__c": "HorizonLink Comm Headset Pro",
+      "Category__c": "Communication Device",
+      "Serial_Number__c": "HLC-2025-112",
+      "Maintenance_Due_Date__c": "2026-07-15",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 1200.00,
+      "Purchase_Price__c": 35000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem7"
+      },
+      "Item_Name__c": "HorizonLink Comm Headset Pro",
+      "Category__c": "Communication Device",
+      "Serial_Number__c": "HLC-2025-113",
+      "Maintenance_Due_Date__c": "2026-02-20",
+      "Status__c": "Maintenance",
+      "Daily_Rental_Rate__c": 1200.00,
+      "Purchase_Price__c": 35000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem8"
+      },
+      "Item_Name__c": "TitanThread Tether Kit - 50m",
+      "Category__c": "Tether Kit",
+      "Serial_Number__c": "TTK-2024-089",
+      "Maintenance_Due_Date__c": "2026-04-30",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 650.00,
+      "Purchase_Price__c": 18000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem9"
+      },
+      "Item_Name__c": "TitanThread Tether Kit - 100m",
+      "Category__c": "Tether Kit",
+      "Serial_Number__c": "TTK-2024-090",
+      "Maintenance_Due_Date__c": "2026-05-05",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 950.00,
+      "Purchase_Price__c": 28000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem10"
+      },
+      "Item_Name__c": "LunarBreath O2 System - Extended",
+      "Category__c": "Oxygen System",
+      "Serial_Number__c": "LBO-2025-156",
+      "Maintenance_Due_Date__c": "2026-03-25",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 3500.00,
+      "Purchase_Price__c": 125000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem11"
+      },
+      "Item_Name__c": "LunarBreath O2 System - Standard",
+      "Category__c": "Oxygen System",
+      "Serial_Number__c": "LBO-2025-157",
+      "Maintenance_Due_Date__c": "2026-04-01",
+      "Status__c": "Rented",
+      "Daily_Rental_Rate__c": 2800.00,
+      "Purchase_Price__c": 95000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem12"
+      },
+      "Item_Name__c": "ShackletonPro Ice Anchor Set",
+      "Category__c": "Crater Anchor",
+      "Serial_Number__c": "SPI-2025-034",
+      "Maintenance_Due_Date__c": "2026-08-10",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 1500.00,
+      "Purchase_Price__c": 42000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem13"
+      },
+      "Item_Name__c": "ThermalShield Gloves - Heavy Duty",
+      "Category__c": "Gloves",
+      "Serial_Number__c": "TSG-2025-221",
+      "Maintenance_Due_Date__c": "2026-05-15",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 500.00,
+      "Purchase_Price__c": 12000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem14"
+      },
+      "Item_Name__c": "ThermalShield Gloves - Standard",
+      "Category__c": "Gloves",
+      "Serial_Number__c": "TSG-2025-222",
+      "Maintenance_Due_Date__c": "2026-05-20",
+      "Status__c": "Available",
+      "Daily_Rental_Rate__c": 500.00,
+      "Purchase_Price__c": 12000.00
+    },
+    {
+      "attributes": {
+        "type": "Gear_Item__c",
+        "referenceId": "GearItem15"
+      },
+      "Item_Name__c": "VintageComm Headset Model A",
+      "Category__c": "Communication Device",
+      "Serial_Number__c": "VCH-2018-005",
+      "Maintenance_Due_Date__c": "2025-12-31",
+      "Status__c": "Retired",
+      "Daily_Rental_Rate__c": 0.00,
+      "Purchase_Price__c": 18000.00
+    }
+  ]
+}

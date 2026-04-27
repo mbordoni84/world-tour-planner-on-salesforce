@@ -109,29 +109,48 @@
 }
 
 /* Status styles */
+.status-zero-staff {
+    border-left: 4px solid #8e030f;
+    background-color: #fef1ee;
+}
+
+.status-zero-staff .staffing-label {
+    color: #8e030f;
+}
+
 .status-needs-staff {
-    border-left: 4px solid #ea001e;
+    border-left: 4px solid #fe5c4c;
 }
 
 .status-needs-staff .staffing-label {
-    color: #ea001e;
-}
-
-.status-open {
-    border-left: 4px solid #2e844a;
-}
-
-.status-open .staffing-label {
-    color: #2e844a;
+    color: #fe5c4c;
 }
 
 .status-full {
-    border-left: 4px solid #706e6b;
-    opacity: 0.7;
+    border-left: 4px solid #2e844a;
 }
 
 .status-full .staffing-label {
-    color: #706e6b;
+    color: #2e844a;
+}
+
+/* Admin assign controls */
+.shift-actions {
+    flex-shrink: 0;
+}
+
+.admin-assign-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.admin-user-combobox {
+    min-width: 12rem;
+}
+
+.remove-btn {
+    color: #ba0517;
 }
 
 /* Mobile responsive */
@@ -140,5 +159,9 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
+    }
+
+    .admin-user-combobox {
+        min-width: 10rem;
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Certification_Level__c</fullName>
+    <label>Certification Level</label>
+    <type>Picklist</type>
+    <required>false</required>
+    <externalId>false</externalId>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Novice Crater Walker</fullName>
+                <default>false</default>
+                <label>Novice Crater Walker</label>
+            </value>
+            <value>
+                <fullName>Advanced Lava Tube Explorer</fullName>
+                <default>false</default>
+                <label>Advanced Lava Tube Explorer</label>
+            </value>
+            <value>
+                <fullName>Master Lunar Alpinist</fullName>
+                <default>false</default>
+                <label>Master Lunar Alpinist</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

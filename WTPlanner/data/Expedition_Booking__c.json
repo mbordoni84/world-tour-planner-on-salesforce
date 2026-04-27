@@ -1,0 +1,108 @@
+{
+  "records": [
+    {
+      "attributes": {
+        "type": "Expedition_Booking__c",
+        "referenceId": "ExpeditionBooking1"
+      },
+      "Expedition_Name__c": "Tycho Shadow Traverse",
+      "Explorer__c": "@LunarExplorer1",
+      "Launch_Date__c": "2026-04-15",
+      "Return_Date__c": "2026-04-22",
+      "Landing_Site__c": "Tycho Crater",
+      "Status__c": "Confirmed",
+      "Total_Cost__c": 285000.00
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Booking__c",
+        "referenceId": "ExpeditionBooking2"
+      },
+      "Expedition_Name__c": "Mare Tranquillitatis Heritage Walk",
+      "Explorer__c": "@LunarExplorer2",
+      "Launch_Date__c": "2026-05-10",
+      "Return_Date__c": "2026-05-14",
+      "Landing_Site__c": "Mare Tranquillitatis",
+      "Status__c": "Confirmed",
+      "Total_Cost__c": 165000.00
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Booking__c",
+        "referenceId": "ExpeditionBooking3"
+      },
+      "Expedition_Name__c": "Shackleton Ice Core Expedition",
+      "Explorer__c": "@LunarExplorer4",
+      "Launch_Date__c": "2026-06-01",
+      "Return_Date__c": "2026-06-15",
+      "Landing_Site__c": "Shackleton Rim",
+      "Status__c": "Planned",
+      "Total_Cost__c": 425000.00
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Booking__c",
+        "referenceId": "ExpeditionBooking4"
+      },
+      "Expedition_Name__c": "Hadley Rille Canyon Survey",
+      "Explorer__c": "@LunarExplorer3",
+      "Launch_Date__c": "2026-07-20",
+      "Return_Date__c": "2026-07-27",
+      "Landing_Site__c": "Hadley Rille",
+      "Status__c": "Planned",
+      "Total_Cost__c": 215000.00
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Booking__c",
+        "referenceId": "ExpeditionBooking5"
+      },
+      "Expedition_Name__c": "Aristarchus Plateau Volcanic Study",
+      "Explorer__c": "@LunarExplorer1",
+      "Launch_Date__c": "2026-08-12",
+      "Return_Date__c": "2026-08-25",
+      "Landing_Site__c": "Aristarchus Plateau",
+      "Status__c": "Planned",
+      "Total_Cost__c": 495000.00
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Booking__c",
+        "referenceId": "ExpeditionBooking6"
+      },
+      "Expedition_Name__c": "First Steps Training Mission",
+      "Explorer__c": "@LunarExplorer5",
+      "Launch_Date__c": "2026-03-25",
+      "Return_Date__c": "2026-03-27",
+      "Landing_Site__c": "Mare Tranquillitatis",
+      "Status__c": "Confirmed",
+      "Total_Cost__c": 52000.00
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Booking__c",
+        "referenceId": "ExpeditionBooking7"
+      },
+      "Expedition_Name__c": "Tycho Central Peak Ascent",
+      "Explorer__c": "@LunarExplorer4",
+      "Launch_Date__c": "2026-09-05",
+      "Return_Date__c": "2026-09-12",
+      "Landing_Site__c": "Tycho Crater",
+      "Status__c": "Planned",
+      "Total_Cost__c": 318000.00
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Booking__c",
+        "referenceId": "ExpeditionBooking8"
+      },
+      "Expedition_Name__c": "Shackleton Rim Reconnaissance",
+      "Explorer__c": "@LunarExplorer2",
+      "Launch_Date__c": "2026-04-01",
+      "Return_Date__c": "2026-04-05",
+      "Landing_Site__c": "Shackleton Rim",
+      "Status__c": "In Progress",
+      "Total_Cost__c": 178000.00
+    }
+  ]
+}

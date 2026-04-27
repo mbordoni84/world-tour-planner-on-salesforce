@@ -5,6 +5,11 @@ import getSessionsNeedingStaff from '@salesforce/apex/ShiftMarketplaceController
 import getMyShifts from '@salesforce/apex/ShiftMarketplaceController.getMyShifts';
 import claimShift from '@salesforce/apex/ShiftMarketplaceController.claimShift';
 import checkOverlap from '@salesforce/apex/ShiftMarketplaceController.checkOverlap';
+import isCurrentUserAdmin from '@salesforce/apex/ShiftMarketplaceController.isCurrentUserAdmin';
+import getEligibleUsers from '@salesforce/apex/ShiftMarketplaceController.getEligibleUsers';
+import adminAssignShift from '@salesforce/apex/ShiftMarketplaceController.adminAssignShift';
+import adminUnassignShift from '@salesforce/apex/ShiftMarketplaceController.adminUnassignShift';
+import checkOverlapsForUsers from '@salesforce/apex/ShiftMarketplaceController.checkOverlapsForUsers';
 
 export default class ShiftMarketplace extends LightningElement {
     @track sessions = [];
@@ -12,6 +17,11 @@ export default class ShiftMarketplace extends LightningElement {
     @track myShiftIds = new Set();
     @track expandedSessionId = null;
     @track isLoading = false;
+
+    // Admin
+    isAdmin = false;
+    eligibleUsers = [];
+    overlapsByShift = {};
 
     // Filters
     @track selectedSessionType = '';
@@ -25,13 +35,27 @@ export default class ShiftMarketplace extends LightningElement {
     @track locationOptions = [{ label: 'All Locations', value: '' }];
     statusOptions = [
         { label: 'All Statuses', value: '' },
+        { label: 'Zero Staff', value: 'zeroStaff' },
         { label: 'Needs Staff', value: 'needsStaff' },
-        { label: 'Open', value: 'open' },
         { label: 'Fully Staffed', value: 'full' }
     ];
 
     wiredSessionsResult;
     wiredMyShiftsResult;
+
+    @wire(isCurrentUserAdmin)
+    wiredIsAdmin({ data }) {
+        if (data !== undefined) {
+            this.isAdmin = data;
+        }
+    }
+
+    @wire(getEligibleUsers)
+    wiredEligibleUsers({ data }) {
+        if (data) {
+            this.eligibleUsers = data;
+        }
+    }
 
     @wire(getSessionsNeedingStaff)
     wiredSessions(result) {
@@ -55,7 +79,8 @@ export default class ShiftMarketplace extends LightningElement {
                         ...shift,
                         isMyShift: shift.assignedUserName && this.myShiftIds.has(shift.id),
                         statusIcon: shift.isClaimed ? 'utility:check' : 'utility:dash',
-                        statusVariant: shift.isClaimed ? 'success' : ''
+                        statusVariant: shift.isClaimed ? 'success' : '',
+                        userOptions: this.buildUserOptions(shift.id)
                     }))
                 };
             });
@@ -86,6 +111,30 @@ export default class ShiftMarketplace extends LightningElement {
         }
     }
 
+    buildUserOptions(shiftId) {
+        const overlappingUserIds = this.overlapsByShift[shiftId] || [];
+        const options = [{ label: '-- Unassigned --', value: '' }];
+        this.eligibleUsers.forEach(u => {
+            const hasOverlap = overlappingUserIds.includes(u.value);
+            options.push({
+                label: hasOverlap ? `⚠ ${u.label}` : u.label,
+                value: u.value
+            });
+        });
+        return options;
+    }
+
+    rebuildUserOptionsForSessions() {
+        this.sessions = this.sessions.map(session => ({
+            ...session,
+            shifts: session.shifts.map(shift => ({
+                ...shift,
+                userOptions: this.buildUserOptions(shift.id)
+            }))
+        }));
+        this.applyFilters();
+    }
+
     updateMyShiftStatus() {
         this.sessions = this.sessions.map(session => ({
             ...session,
@@ -100,20 +149,37 @@ export default class ShiftMarketplace extends LightningElement {
     }
 
     getStatusClass(session) {
+        if (session.needsStaff && session.claimedShifts === 0) return 'session-card status-zero-staff';
         if (session.needsStaff) return 'session-card status-needs-staff';
-        if (session.isFull) return 'session-card status-full';
-        return 'session-card status-open';
+        return 'session-card status-full';
     }
 
     getStatusKey(session) {
+        if (session.needsStaff && session.claimedShifts === 0) return 'zeroStaff';
         if (session.needsStaff) return 'needsStaff';
-        if (session.isFull) return 'full';
-        return 'open';
+        return 'full';
+    }
+
+    rebuildLocationOptions() {
+        const locationSet = new Set();
+        this.sessions.forEach(session => {
+            if (session.location && (!this.selectedSessionType || session.sessionType === this.selectedSessionType)) {
+                locationSet.add(session.location);
+            }
+        });
+        this.locationOptions = [{ label: 'All Locations', value: '' }];
+        [...locationSet].sort().forEach(l => {
+            this.locationOptions.push({ label: l, value: l });
+        });
+        if (this.selectedLocation && !locationSet.has(this.selectedLocation)) {
+            this.selectedLocation = '';
+        }
     }
 
     // Filter handlers
     handleSessionTypeChange(event) {
         this.selectedSessionType = event.detail.value;
+        this.rebuildLocationOptions();
         this.applyFilters();
     }
 
@@ -170,13 +236,34 @@ export default class ShiftMarketplace extends LightningElement {
     }
 
     toggleSession(sessionId) {
-        this.expandedSessionId = this.expandedSessionId === sessionId ? null : sessionId;
+        const wasExpanded = this.expandedSessionId === sessionId;
+        this.expandedSessionId = wasExpanded ? null : sessionId;
         this.sessions = this.sessions.map(s => ({
             ...s,
             isExpanded: s.id === this.expandedSessionId,
             expandIcon: s.id === this.expandedSessionId ? 'utility:chevronup' : 'utility:chevrondown'
         }));
         this.applyFilters();
+
+        if (!wasExpanded && this.isAdmin) {
+            this.loadOverlapsForSession(sessionId);
+        }
+    }
+
+    async loadOverlapsForSession(sessionId) {
+        const session = this.sessions.find(s => s.id === sessionId);
+        if (!session) return;
+
+        const shiftIds = session.shifts.map(s => s.id);
+        if (shiftIds.length === 0) return;
+
+        try {
+            const overlaps = await checkOverlapsForUsers({ shiftIds });
+            this.overlapsByShift = { ...this.overlapsByShift, ...overlaps };
+            this.rebuildUserOptionsForSessions();
+        } catch (error) {
+            // Silently fail — overlap indicators are a nice-to-have
+        }
     }
 
     async handleClaimShift(event) {
@@ -202,6 +289,74 @@ export default class ShiftMarketplace extends LightningElement {
             this.showToast('Error', error.body?.message || 'Error claiming shift', 'error');
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    async handleAdminAssign(event) {
+        event.stopPropagation();
+        const shiftId = event.target.dataset.shiftId;
+        const userId = event.detail.value;
+        const previousUserId = event.target.dataset.currentUser || '';
+
+        if (userId === previousUserId) return;
+
+        if (!userId) {
+            await this.doAdminUnassign(shiftId);
+            return;
+        }
+
+        const overlappingUserIds = this.overlapsByShift[shiftId] || [];
+        if (overlappingUserIds.includes(userId)) {
+            const userName = this.eligibleUsers.find(u => u.value === userId)?.label || 'This user';
+            const proceed = confirm(`Warning: ${userName} has an overlapping shift.\n\nAssign anyway?`);
+            if (!proceed) {
+                this.resetCombobox(shiftId, previousUserId);
+                return;
+            }
+        }
+
+        this.isLoading = true;
+        try {
+            await adminAssignShift({ shiftId, userId });
+            this.showToast('Success', 'Shift assigned successfully', 'success');
+            await this.refreshAll();
+            if (this.expandedSessionId) {
+                await this.loadOverlapsForSession(this.expandedSessionId);
+            }
+        } catch (error) {
+            this.showToast('Error', error.body?.message || 'Error assigning shift', 'error');
+            this.resetCombobox(shiftId, previousUserId);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    async handleAdminUnassign(event) {
+        event.stopPropagation();
+        const shiftId = event.target.dataset.shiftId;
+        await this.doAdminUnassign(shiftId);
+    }
+
+    async doAdminUnassign(shiftId) {
+        this.isLoading = true;
+        try {
+            await adminUnassignShift({ shiftId });
+            this.showToast('Success', 'User removed from shift', 'success');
+            await this.refreshAll();
+            if (this.expandedSessionId) {
+                await this.loadOverlapsForSession(this.expandedSessionId);
+            }
+        } catch (error) {
+            this.showToast('Error', error.body?.message || 'Error removing user', 'error');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    resetCombobox(shiftId, previousValue) {
+        const combobox = this.template.querySelector(`lightning-combobox[data-shift-id="${shiftId}"]`);
+        if (combobox) {
+            combobox.value = previousValue || '';
         }
     }
 

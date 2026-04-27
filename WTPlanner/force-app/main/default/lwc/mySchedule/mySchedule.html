@@ -1,0 +1,106 @@
+<template>
+    <lightning-card title={scheduleTitle} icon-name="standard:timesheet">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+                variant="neutral"
+            ></lightning-button>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <!-- Admin: view other user's schedule -->
+            <template if:true={isAdmin}>
+                <div class="slds-m-bottom_medium admin-user-picker">
+                    <lightning-combobox
+                        label="View schedule for"
+                        value={selectedUserId}
+                        options={userOptions}
+                        onchange={handleUserChange}
+                        placeholder="Select a user..."
+                    ></lightning-combobox>
+                </div>
+            </template>
+            <!-- Overlap Warning -->
+            <template if:true={hasOverlaps}>
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning slds-m-bottom_medium">
+                    <span class="slds-assistive-text">warning</span>
+                    <h2>
+                        <lightning-icon icon-name="utility:warning" size="x-small" variant="warning"></lightning-icon>
+                        You have {overlapCount} overlapping shift(s).
+                        <lightning-button
+                            label="View Details"
+                            variant="base"
+                            onclick={handleViewOverlaps}
+                            class="slds-m-left_small"
+                        ></lightning-button>
+                    </h2>
+                </div>
+            </template>
+
+            <!-- Loading Spinner -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <!-- Timeline View -->
+            <template if:true={hasShifts}>
+                <div class="timeline-container">
+                    <template for:each={myShifts} for:item="shift">
+                        <div key={shift.id} class={shift.hasOverlapClass}>
+                            <article class="slds-card assignment-card">
+                                <div class="slds-card__header">
+                                    <h3 class="slds-card__header-title">
+                                        <span class="session-title">{shift.sessionName}</span>
+                                    </h3>
+                                    <template if:true={shift.hasOverlap}>
+                                        <lightning-badge label="Overlap" variant="warning" icon-name="utility:warning"></lightning-badge>
+                                    </template>
+                                </div>
+                                <div class="slds-card__body slds-card__body_inner">
+                                    <div class="shift-details">
+                                        <div class="detail-row">
+                                            <lightning-icon icon-name="utility:clock" size="x-small"></lightning-icon>
+                                            <span class="time-display">{shift.shiftTime}</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <lightning-icon icon-name="utility:location" size="x-small"></lightning-icon>
+                                            <span>{shift.sessionLocation}</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <lightning-icon icon-name="utility:groups" size="x-small"></lightning-icon>
+                                            <lightning-badge label={shift.sessionType}></lightning-badge>
+                                        </div>
+                                    </div>
+                                </div>
+                                <template if:false={isViewingOtherUser}>
+                                    <div class="slds-card__footer">
+                                        <lightning-button
+                                            label="Drop Shift"
+                                            variant="destructive-text"
+                                            data-id={shift.id}
+                                            data-name={shift.sessionName}
+                                            onclick={handleDropShift}
+                                        ></lightning-button>
+                                    </div>
+                                </template>
+                            </article>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template if:false={hasShifts}>
+                <div class="slds-text-align_center slds-p-vertical_large empty-state">
+                    <lightning-icon icon-name="utility:event" size="large"></lightning-icon>
+                    <p class="slds-m-top_small slds-text-heading_small">No shifts assigned yet</p>
+                    <p class="slds-m-top_x-small slds-text-color_weak">
+                        Visit the Shift Marketplace to claim your first shift!
+                    </p>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

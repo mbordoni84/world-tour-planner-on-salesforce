@@ -1,0 +1,130 @@
+{
+  "records": [
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear1"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking1",
+      "Gear_Item__c": "@GearItem1",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear2"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking1",
+      "Gear_Item__c": "@GearItem10",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear3"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking1",
+      "Gear_Item__c": "@GearItem4",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear4"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking1",
+      "Gear_Item__c": "@GearItem13",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear5"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking1",
+      "Gear_Item__c": "@GearItem6",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear6"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking2",
+      "Gear_Item__c": "@GearItem2",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear7"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking2",
+      "Gear_Item__c": "@GearItem11",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear8"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking2",
+      "Gear_Item__c": "@GearItem5",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear9"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking3",
+      "Gear_Item__c": "@GearItem3",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear10"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking3",
+      "Gear_Item__c": "@GearItem12",
+      "Quantity__c": 2
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear11"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking3",
+      "Gear_Item__c": "@GearItem9",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear12"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking4",
+      "Gear_Item__c": "@GearItem8",
+      "Quantity__c": 2
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear13"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking5",
+      "Gear_Item__c": "@GearItem14",
+      "Quantity__c": 1
+    },
+    {
+      "attributes": {
+        "type": "Expedition_Gear__c",
+        "referenceId": "ExpeditionGear14"
+      },
+      "Expedition_Booking__c": "@ExpeditionBooking6",
+      "Gear_Item__c": "@GearItem8",
+      "Quantity__c": 1
+    }
+  ]
+}

@@ -14,9 +14,9 @@ public with sharing class AdminRosterController {
                 ORDER BY Start_Time__c
             ];
 
-            // Build staffing counts and overlap flags per session
-            Map<Id, Integer> claimedBySession = new Map<Id, Integer>();
-            Map<Id, Integer> totalBySession = new Map<Id, Integer>();
+            // Build staffing counts per session+slot and overlap flags per session
+            Map<String, Integer> claimedBySessionSlot = new Map<String, Integer>();
+            Map<String, Integer> totalBySessionSlot = new Map<String, Integer>();
             Map<Id, Boolean> overlapBySession = new Map<Id, Boolean>();
             Set<String> sessionTypeSet = new Set<String>();
             Set<String> sessionNameSet = new Set<String>();
@@ -24,9 +24,10 @@ public with sharing class AdminRosterController {
 
             for (Shift__c shift : allShifts) {
                 Id sessId = shift.Session__c;
-                totalBySession.put(sessId, (totalBySession.containsKey(sessId) ? totalBySession.get(sessId) : 0) + 1);
+                String slotKey = sessId + ':' + String.valueOf(shift.Start_Time__c) + '-' + String.valueOf(shift.End_Time__c);
+                totalBySessionSlot.put(slotKey, (totalBySessionSlot.containsKey(slotKey) ? totalBySessionSlot.get(slotKey) : 0) + 1);
                 if (shift.User__c != null) {
-                    claimedBySession.put(sessId, (claimedBySession.containsKey(sessId) ? claimedBySession.get(sessId) : 0) + 1);
+                    claimedBySessionSlot.put(slotKey, (claimedBySessionSlot.containsKey(slotKey) ? claimedBySessionSlot.get(slotKey) : 0) + 1);
                 }
                 if (shift.Has_Overlap__c && shift.User__c != null) {
                     overlapBySession.put(sessId, true);
@@ -76,10 +77,12 @@ public with sharing class AdminRosterController {
                     cellData.put(timeSlot, shift.Session__r.Name);
 
                     Id sessId = shift.Session__c;
-                    Integer claimed = claimedBySession.containsKey(sessId) ? claimedBySession.get(sessId) : 0;
+                    String slotKey = sessId + ':' + String.valueOf(shift.Start_Time__c) + '-' + String.valueOf(shift.End_Time__c);
+                    Integer slotClaimed = claimedBySessionSlot.containsKey(slotKey) ? claimedBySessionSlot.get(slotKey) : 0;
                     Integer minS = shift.Session__r.Min_Shifts__c != null ? (Integer)shift.Session__r.Min_Shifts__c : 1;
                     Integer maxS = shift.Session__r.Max_Shifts__c != null ? (Integer)shift.Session__r.Max_Shifts__c : 5;
-                    String staffStatus = claimed < minS ? 'Needs Staff' : (claimed >= maxS ? 'Fully Staffed' : 'Min Reached');
+                    Integer slotTotal = totalBySessionSlot.containsKey(slotKey) ? totalBySessionSlot.get(slotKey) : 0;
+                    String staffStatus = slotClaimed < minS ? 'Needs Staff' : 'Fully Staffed';
                     Boolean hasSessionOverlap = overlapBySession.containsKey(sessId) && overlapBySession.get(sessId);
 
                     CellDetail detail = new CellDetail();
@@ -87,9 +90,9 @@ public with sharing class AdminRosterController {
                     detail.sessionType = shift.Session__r.Session_Type__r.Name != null ? shift.Session__r.Session_Type__r.Name : '';
                     detail.timeRange = formatHHMM(shift.Start_Time__c) + ' - ' + formatHHMM(shift.End_Time__c);
                     detail.location = shift.Session__r.Location__c != null ? shift.Session__r.Location__c : '';
-                    detail.staffingLabel = claimed + '/' + minS + ' min (' + maxS + ' max)';
+                    detail.staffingLabel = slotClaimed + '/' + minS + ' min (' + maxS + ' max)';
                     detail.status = staffStatus;
-                    detail.minReached = claimed >= minS;
+                    detail.minReached = slotClaimed >= minS;
                     detail.hasOverlap = shift.Has_Overlap__c;
                     detail.sessionHasOverlap = hasSessionOverlap;
                     cellDetails.put(timeSlot, detail);
@@ -102,11 +105,11 @@ public with sharing class AdminRosterController {
             List<ShiftRosterWrapper> shiftWrappers = new List<ShiftRosterWrapper>();
             for (Shift__c shift : allShifts) {
                 Id sessId = shift.Session__c;
-                Integer claimed = claimedBySession.containsKey(sessId) ? claimedBySession.get(sessId) : 0;
+                String slotKey = sessId + ':' + String.valueOf(shift.Start_Time__c) + '-' + String.valueOf(shift.End_Time__c);
+                Integer slotClaimed = claimedBySessionSlot.containsKey(slotKey) ? claimedBySessionSlot.get(slotKey) : 0;
                 Integer minS = shift.Session__r.Min_Shifts__c != null ? (Integer)shift.Session__r.Min_Shifts__c : 1;
-                Integer maxS = shift.Session__r.Max_Shifts__c != null ? (Integer)shift.Session__r.Max_Shifts__c : 5;
                 Boolean sessionOverlap = overlapBySession.containsKey(sessId) && overlapBySession.get(sessId);
-                shiftWrappers.add(new ShiftRosterWrapper(shift, claimed >= minS, sessionOverlap));
+                shiftWrappers.add(new ShiftRosterWrapper(shift, slotClaimed >= minS, sessionOverlap));
             }
 
             // Build filter options

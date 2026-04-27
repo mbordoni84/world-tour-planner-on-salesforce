@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Gear_Item__c</fullName>
+    <label>Gear Item</label>
+    <type>MasterDetail</type>
+    <externalId>false</externalId>
+    <referenceTo>Gear_Item__c</referenceTo>
+    <relationshipLabel>Expedition Gear</relationshipLabel>
+    <relationshipName>Expedition_Gear</relationshipName>
+    <relationshipOrder>1</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

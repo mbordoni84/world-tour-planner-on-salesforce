@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Explorer__c</fullName>
+    <label>Explorer</label>
+    <type>Lookup</type>
+    <required>false</required>
+    <externalId>false</externalId>
+    <referenceTo>Lunar_Explorer__c</referenceTo>
+    <relationshipLabel>Safety Certifications</relationshipLabel>
+    <relationshipName>Safety_Certifications</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+</CustomField>

@@ -1,0 +1,148 @@
+{
+  "records": [
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert1"
+      },
+      "Explorer__c": "@LunarExplorer1",
+      "Certification_Type__c": "Basic EVA",
+      "Issued_Date__c": "2023-06-15",
+      "Expiry_Date__c": "2026-06-15",
+      "Instructor_Name__c": "Commander Patricia Walsh",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert2"
+      },
+      "Explorer__c": "@LunarExplorer1",
+      "Certification_Type__c": "Low-G Climbing",
+      "Issued_Date__c": "2024-03-10",
+      "Expiry_Date__c": "2027-03-10",
+      "Instructor_Name__c": "Dr. James Morrison",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert3"
+      },
+      "Explorer__c": "@LunarExplorer1",
+      "Certification_Type__c": "Emergency Repair",
+      "Issued_Date__c": "2024-08-20",
+      "Expiry_Date__c": "2027-08-20",
+      "Instructor_Name__c": "Engineer Maria Santos",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert4"
+      },
+      "Explorer__c": "@LunarExplorer2",
+      "Certification_Type__c": "Basic EVA",
+      "Issued_Date__c": "2024-01-20",
+      "Expiry_Date__c": "2027-01-20",
+      "Instructor_Name__c": "Commander Patricia Walsh",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert5"
+      },
+      "Explorer__c": "@LunarExplorer2",
+      "Certification_Type__c": "Crater Navigation",
+      "Issued_Date__c": "2024-09-15",
+      "Expiry_Date__c": "2027-09-15",
+      "Instructor_Name__c": "Navigator Chen Wei",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert6"
+      },
+      "Explorer__c": "@LunarExplorer3",
+      "Certification_Type__c": "Basic EVA",
+      "Issued_Date__c": "2025-02-10",
+      "Expiry_Date__c": "2028-02-10",
+      "Instructor_Name__c": "Commander Patricia Walsh",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert7"
+      },
+      "Explorer__c": "@LunarExplorer3",
+      "Certification_Type__c": "Solar Radiation Protocol",
+      "Issued_Date__c": "2025-06-22",
+      "Expiry_Date__c": "2028-06-22",
+      "Instructor_Name__c": "Dr. Priya Sharma",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert8"
+      },
+      "Explorer__c": "@LunarExplorer4",
+      "Certification_Type__c": "Basic EVA",
+      "Issued_Date__c": "2022-08-15",
+      "Expiry_Date__c": "2025-08-15",
+      "Instructor_Name__c": "Commander Patricia Walsh",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert9"
+      },
+      "Explorer__c": "@LunarExplorer4",
+      "Certification_Type__c": "Emergency Repair",
+      "Issued_Date__c": "2023-11-10",
+      "Expiry_Date__c": "2026-11-10",
+      "Instructor_Name__c": "Engineer Maria Santos",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert10"
+      },
+      "Explorer__c": "@LunarExplorer4",
+      "Certification_Type__c": "Low-G Climbing",
+      "Issued_Date__c": "2024-05-18",
+      "Expiry_Date__c": "2027-05-18",
+      "Instructor_Name__c": "Dr. James Morrison",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert11"
+      },
+      "Explorer__c": "@LunarExplorer5",
+      "Certification_Type__c": "Basic EVA",
+      "Issued_Date__c": "2025-12-01",
+      "Expiry_Date__c": "2028-12-01",
+      "Instructor_Name__c": "Commander Patricia Walsh",
+      "Pass_Status__c": true
+    },
+    {
+      "attributes": {
+        "type": "Safety_Certification__c",
+        "referenceId": "SafetyCert12"
+      },
+      "Explorer__c": "@LunarExplorer2",
+      "Certification_Type__c": "Solar Radiation Protocol",
+      "Issued_Date__c": "2022-05-10",
+      "Expiry_Date__c": "2025-05-10",
+      "Instructor_Name__c": "Dr. Priya Sharma",
+      "Pass_Status__c": false
+    }
+  ]
+}

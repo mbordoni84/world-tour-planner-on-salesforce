@@ -184,9 +184,16 @@ public with sharing class StaffingDashboardController {
             Integer claimedCount = 0;
             Time earliest = null;
             Time latest = null;
+
+            Map<String, Integer> claimedBySlot = new Map<String, Integer>();
+            Map<String, Integer> totalBySlot = new Map<String, Integer>();
+
             for (Shift__c shift : session.Shifts__r) {
+                String slotKey = String.valueOf(shift.Start_Time__c) + '-' + String.valueOf(shift.End_Time__c);
+                totalBySlot.put(slotKey, (totalBySlot.containsKey(slotKey) ? totalBySlot.get(slotKey) : 0) + 1);
                 if (shift.User__c != null) {
                     claimedCount++;
+                    claimedBySlot.put(slotKey, (claimedBySlot.containsKey(slotKey) ? claimedBySlot.get(slotKey) : 0) + 1);
                 }
                 if (earliest == null || shift.Start_Time__c < earliest) {
                     earliest = shift.Start_Time__c;
@@ -203,12 +210,20 @@ public with sharing class StaffingDashboardController {
                 this.timeRange = 'No shifts';
             }
 
-            if (claimedCount < this.minShifts) {
+            Boolean anySlotNeedsStaff = false;
+            Boolean allSlotsMinReached = !totalBySlot.isEmpty();
+            for (String slotKey : totalBySlot.keySet()) {
+                Integer slotClaimed = claimedBySlot.containsKey(slotKey) ? claimedBySlot.get(slotKey) : 0;
+                if (slotClaimed < this.minShifts) {
+                    anySlotNeedsStaff = true;
+                    allSlotsMinReached = false;
+                }
+            }
+
+            if (anySlotNeedsStaff) {
                 this.status = 'Needs Staff';
-            } else if (claimedCount >= this.maxShifts) {
-                this.status = 'Fully Staffed';
             } else {
-                this.status = 'Min Reached';
+                this.status = 'Fully Staffed';
             }
         }
 

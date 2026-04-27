@@ -1,0 +1,64 @@
+{
+  "records": [
+    {
+      "attributes": {
+        "type": "Lunar_Explorer__c",
+        "referenceId": "LunarExplorer1"
+      },
+      "Full_Name__c": "Sarah Chen",
+      "Email__c": "sarah.chen@lunarbasecamp.moon",
+      "EVA_Hours__c": 487.5,
+      "Certification_Level__c": "Master Lunar Alpinist",
+      "Medical_Clearance_Date__c": "2025-12-15",
+      "Emergency_Contact__c": "Dr. Michael Chen +1-555-0101"
+    },
+    {
+      "attributes": {
+        "type": "Lunar_Explorer__c",
+        "referenceId": "LunarExplorer2"
+      },
+      "Full_Name__c": "Marcus Rodriguez",
+      "Email__c": "marcus.rodriguez@lunarbasecamp.moon",
+      "EVA_Hours__c": 312.25,
+      "Certification_Level__c": "Advanced Lava Tube Explorer",
+      "Medical_Clearance_Date__c": "2026-01-20",
+      "Emergency_Contact__c": "Elena Rodriguez +1-555-0202"
+    },
+    {
+      "attributes": {
+        "type": "Lunar_Explorer__c",
+        "referenceId": "LunarExplorer3"
+      },
+      "Full_Name__c": "Yuki Tanaka",
+      "Email__c": "yuki.tanaka@lunarbasecamp.moon",
+      "EVA_Hours__c": 156.75,
+      "Certification_Level__c": "Advanced Lava Tube Explorer",
+      "Medical_Clearance_Date__c": "2026-02-05",
+      "Emergency_Contact__c": "Hiroshi Tanaka +81-3-5555-0303"
+    },
+    {
+      "attributes": {
+        "type": "Lunar_Explorer__c",
+        "referenceId": "LunarExplorer4"
+      },
+      "Full_Name__c": "Dmitri Volkov",
+      "Email__c": "dmitri.volkov@lunarbasecamp.moon",
+      "EVA_Hours__c": 425.00,
+      "Certification_Level__c": "Master Lunar Alpinist",
+      "Medical_Clearance_Date__c": "2025-11-10",
+      "Emergency_Contact__c": "Svetlana Volkova +7-495-555-0404"
+    },
+    {
+      "attributes": {
+        "type": "Lunar_Explorer__c",
+        "referenceId": "LunarExplorer5"
+      },
+      "Full_Name__c": "Amara Okonkwo",
+      "Email__c": "amara.okonkwo@lunarbasecamp.moon",
+      "EVA_Hours__c": 78.50,
+      "Certification_Level__c": "Novice Crater Walker",
+      "Medical_Clearance_Date__c": "2026-02-28",
+      "Emergency_Contact__c": "Chidi Okonkwo +234-1-555-0505"
+    }
+  ]
+}

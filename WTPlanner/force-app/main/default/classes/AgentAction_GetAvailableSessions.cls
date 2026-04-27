@@ -41,19 +41,19 @@ public with sharing class AgentAction_GetAvailableSessions {
         Integer count = 0;
 
         for (Session__c s : sessions) {
-            Integer claimed = 0;
-            Integer total = s.Shifts__r.size();
             List<String> availableShiftTimes = new List<String>();
 
+            Map<String, Integer> claimedBySlot = new Map<String, Integer>();
+            Map<String, Integer> totalBySlot = new Map<String, Integer>();
+
             for (Shift__c sh : s.Shifts__r) {
+                String slotKey = String.valueOf(sh.Start_Time__c) + '-' + String.valueOf(sh.End_Time__c);
+                totalBySlot.put(slotKey, (totalBySlot.containsKey(slotKey) ? totalBySlot.get(slotKey) : 0) + 1);
                 if (sh.User__c != null) {
-                    claimed++;
+                    claimedBySlot.put(slotKey, (claimedBySlot.containsKey(slotKey) ? claimedBySlot.get(slotKey) : 0) + 1);
                 } else {
-                    // Build shift time string with overlap warning
                     String timeStr = StaffingAgentActions.formatTime(sh.Start_Time__c) + '-' +
                                      StaffingAgentActions.formatTime(sh.End_Time__c);
-
-                    // Check for overlap with user's existing shifts
                     String overlapWarning = getOverlapWarning(sh, myShifts);
                     if (String.isNotBlank(overlapWarning)) {
                         timeStr += ' ' + overlapWarning;
@@ -64,8 +64,18 @@ public with sharing class AgentAction_GetAvailableSessions {
 
             if (!availableShiftTimes.isEmpty()) {
                 Integer minNeeded = s.Min_Shifts__c != null ? (Integer)s.Min_Shifts__c : 1;
-                String staffingInfo = claimed + '/' + minNeeded + ' min';
-                if (claimed < minNeeded) {
+                Boolean anySlotNeedsStaff = false;
+                Integer worstClaimed = minNeeded;
+                for (String slotKey : totalBySlot.keySet()) {
+                    Integer slotClaimed = claimedBySlot.containsKey(slotKey) ? claimedBySlot.get(slotKey) : 0;
+                    if (slotClaimed < minNeeded) {
+                        anySlotNeedsStaff = true;
+                        worstClaimed = Math.min(worstClaimed, slotClaimed);
+                    }
+                }
+
+                String staffingInfo = worstClaimed + '/' + minNeeded + ' min per slot';
+                if (anySlotNeedsStaff) {
                     staffingInfo += ' — NEEDS STAFF';
                 } else {
                     staffingInfo += ' reached';
