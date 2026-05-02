@@ -1,0 +1,11 @@
+{
+  "apps": {
+    "E0AKHGA1ME2": {
+      "app_id": "A0B1E2W443E",
+      "enterprise_id": "E0AKHGA1ME2",
+      "team_domain": "slack-demo-18131",
+      "team_id": "E0AKHGA1ME2"
+    }
+  },
+  "default": "slack-demo-18131"
+}
