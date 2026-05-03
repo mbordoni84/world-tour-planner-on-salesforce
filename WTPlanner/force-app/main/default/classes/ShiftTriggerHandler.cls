@@ -4,6 +4,7 @@ public with sharing class ShiftTriggerHandler {
         if (Trigger.isAfter) {
             Set<Id> affectedUserIds = new Set<Id>();
             List<Shift__c> unassignedWithOverlap = new List<Shift__c>();
+            List<ShiftChangeEvent> changeEvents = new List<ShiftChangeEvent>();
 
             if (Trigger.isInsert || Trigger.isUpdate || Trigger.isUndelete) {
                 for (Shift__c shift : (List<Shift__c>)Trigger.new) {
@@ -23,12 +24,47 @@ public with sharing class ShiftTriggerHandler {
                 }
             }
 
+            if (Trigger.isUpdate) {
+                Map<Id, Shift__c> oldMap = (Map<Id, Shift__c>)Trigger.oldMap;
+                for (Shift__c shift : (List<Shift__c>)Trigger.new) {
+                    Shift__c oldShift = oldMap.get(shift.Id);
+                    if (shift.User__c != oldShift.User__c) {
+                        if (oldShift.User__c != null) {
+                            changeEvents.add(new ShiftChangeEvent(shift.Id, oldShift.User__c, 'removed'));
+                        }
+                        if (shift.User__c != null) {
+                            changeEvents.add(new ShiftChangeEvent(shift.Id, shift.User__c, 'assigned'));
+                        }
+                    }
+                }
+            }
+
+            if (Trigger.isInsert || Trigger.isUndelete) {
+                for (Shift__c shift : (List<Shift__c>)Trigger.new) {
+                    if (shift.User__c != null) {
+                        changeEvents.add(new ShiftChangeEvent(shift.Id, shift.User__c, 'assigned'));
+                    }
+                }
+            }
+
+            if (Trigger.isDelete) {
+                for (Shift__c shift : (List<Shift__c>)Trigger.old) {
+                    if (shift.User__c != null) {
+                        changeEvents.add(new ShiftChangeEvent(shift.Id, shift.User__c, 'removed'));
+                    }
+                }
+            }
+
             if (!unassignedWithOverlap.isEmpty()) {
                 update unassignedWithOverlap;
             }
 
             if (!affectedUserIds.isEmpty()) {
                 detectOverlaps(affectedUserIds);
+            }
+
+            if (!changeEvents.isEmpty()) {
+                notifySlack(changeEvents);
             }
         }
     }
@@ -95,5 +131,85 @@ public with sharing class ShiftTriggerHandler {
         Long end2Ms = end2.hour() * 3600000 + end2.minute() * 60000;
 
         return (start1Ms < end2Ms) && (end1Ms > start2Ms);
+    }
+
+    private void notifySlack(List<ShiftChangeEvent> events) {
+        Set<Id> shiftIds = new Set<Id>();
+        Set<Id> userIds = new Set<Id>();
+        for (ShiftChangeEvent evt : events) {
+            shiftIds.add(evt.shiftId);
+            userIds.add(evt.userId);
+        }
+
+        Map<Id, Shift__c> shiftMap = new Map<Id, Shift__c>([
+            SELECT Id, Start_Time__c, End_Time__c, Session__r.Name
+            FROM Shift__c
+            WHERE Id IN :shiftIds
+        ]);
+
+        Map<Id, User> userMap = new Map<Id, User>([
+            SELECT Id, Email FROM User WHERE Id IN :userIds
+        ]);
+
+        String webhookUrl = Label.Slack_Shift_Webhook_URL;
+        if (String.isBlank(webhookUrl) || webhookUrl == 'PASTE_WEBHOOK_URL_HERE') {
+            return;
+        }
+
+        List<String> payloads = new List<String>();
+        for (ShiftChangeEvent evt : events) {
+            Shift__c shift = shiftMap.get(evt.shiftId);
+            User u = userMap.get(evt.userId);
+            if (shift == null || u == null) continue;
+
+            String sessionName = shift.Session__r != null ? shift.Session__r.Name : 'Unknown';
+            String shiftTime = formatTime(shift.Start_Time__c) + ' - ' + formatTime(shift.End_Time__c);
+
+            payloads.add(JSON.serialize(new Map<String, Object>{
+                'user_email' => u.Email,
+                'session_name' => sessionName,
+                'shift_time' => shiftTime,
+                'change_type' => evt.changeType
+            }));
+        }
+
+        if (!payloads.isEmpty()) {
+            sendSlackNotifications(webhookUrl, payloads);
+        }
+    }
+
+    private String formatTime(Time t) {
+        if (t == null) return '';
+        return String.valueOf(t.hour()).leftPad(2, '0') + ':' + String.valueOf(t.minute()).leftPad(2, '0');
+    }
+
+    @future(callout=true)
+    public static void sendSlackNotifications(String webhookUrl, List<String> payloads) {
+        for (String payload : payloads) {
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(webhookUrl);
+            req.setMethod('POST');
+            req.setHeader('Content-Type', 'application/json');
+            req.setBody(payload);
+            req.setTimeout(10000);
+
+            try {
+                new Http().send(req);
+            } catch (Exception e) {
+                System.debug(LoggingLevel.ERROR, 'Slack webhook failed: ' + e.getMessage());
+            }
+        }
+    }
+
+    private class ShiftChangeEvent {
+        public Id shiftId;
+        public Id userId;
+        public String changeType;
+
+        public ShiftChangeEvent(Id shiftId, Id userId, String changeType) {
+            this.shiftId = shiftId;
+            this.userId = userId;
+            this.changeType = changeType;
+        }
     }
 }

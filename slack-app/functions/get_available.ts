@@ -27,33 +27,15 @@ export const GetAvailableDefinition = DefineFunction({
   },
 });
 
-async function postSessionList(
-  client: Parameters<Parameters<typeof SlackFunction>[1]>[0]["client"],
+function buildBlocks(
+  sessions: SessionData[],
+  myShifts: MyShiftInfo[],
   tokenId: string,
-  userId: string,
-  channelId: string,
+  page: number,
+  sessionTypeFilter: string,
   headerPrefix?: string,
-) {
-  const [sessionsResult, myShiftsResult] = await Promise.all([
-    sfFetch(client, tokenId, "/staffing/available-sessions"),
-    sfFetch(client, tokenId, "/staffing/my-shifts"),
-  ]);
-
-  if (!sessionsResult.ok) {
-    await client.chat.postEphemeral({
-      channel: channelId,
-      user: userId,
-      text: `Error fetching sessions: ${JSON.stringify(sessionsResult.data)}`,
-    });
-    return;
-  }
-
-  const sessions = sessionsResult.data as unknown as SessionData[];
+): { blocks: Record<string, unknown>[]; text: string } {
   const needingStaff = sessions.filter((s) => s.needsStaff);
-
-  const myShifts: MyShiftInfo[] = myShiftsResult.ok
-    ? (myShiftsResult.data as unknown as MyShiftInfo[])
-    : [];
 
   const blocks: Record<string, unknown>[] = [];
 
@@ -73,26 +55,93 @@ async function postSessionList(
     },
   });
   blocks.push({ type: "divider" });
-  blocks.push(...sessionListBlocks(sessions, myShifts, tokenId));
+  blocks.push(...sessionListBlocks(sessions, myShifts, tokenId, page, sessionTypeFilter));
 
-  await client.chat.postEphemeral({
-    channel: channelId,
-    user: userId,
-    blocks,
-    text: `${needingStaff.length} session(s) need staff.`,
-  });
+  return { blocks, text: `${needingStaff.length} session(s) need staff.` };
+}
+
+async function fetchAndBuild(
+  client: Parameters<Parameters<typeof SlackFunction>[1]>[0]["client"],
+  tokenId: string,
+  page: number,
+  sessionTypeFilter: string,
+  headerPrefix?: string,
+): Promise<{ blocks: Record<string, unknown>[]; text: string } | null> {
+  const [sessionsResult, myShiftsResult] = await Promise.all([
+    sfFetch(client, tokenId, "/staffing/available-sessions"),
+    sfFetch(client, tokenId, "/staffing/my-shifts"),
+  ]);
+
+  if (!sessionsResult.ok) return null;
+
+  const sessions = sessionsResult.data as unknown as SessionData[];
+  const myShifts: MyShiftInfo[] = myShiftsResult.ok
+    ? (myShiftsResult.data as unknown as MyShiftInfo[])
+    : [];
+
+  return buildBlocks(sessions, myShifts, tokenId, page, sessionTypeFilter, headerPrefix);
 }
 
 const getAvailable = SlackFunction(
   GetAvailableDefinition,
   async ({ inputs, client }) => {
-    await postSessionList(
-      client,
-      inputs.sf_token_id,
-      inputs.user_id,
-      inputs.channel_id,
-    );
+    const result = await fetchAndBuild(client, inputs.sf_token_id, 0, "all");
+    if (!result) {
+      await client.chat.postEphemeral({
+        channel: inputs.channel_id,
+        user: inputs.user_id,
+        text: "Error fetching sessions from Salesforce.",
+      });
+      return { completed: false };
+    }
+    await client.chat.postEphemeral({
+      channel: inputs.channel_id,
+      user: inputs.user_id,
+      blocks: result.blocks,
+      text: result.text,
+    });
     return { completed: false };
+  },
+).addBlockActionsHandler(
+  "filter_session_type",
+  async ({ action, body, client }) => {
+    const selectedType = action.selected_option?.value ?? "all";
+    const blockId = action.block_id ?? "";
+    const tokenId = blockId.startsWith("filter_ctx::") ? blockId.slice("filter_ctx::".length) : "";
+    const userId = body.user.id;
+    const channelId = body.channel?.id ?? body.container?.channel_id ?? "";
+
+    const result = await fetchAndBuild(client, tokenId, 0, selectedType);
+    if (result) {
+      await client.chat.postEphemeral({
+        channel: channelId,
+        user: userId,
+        blocks: result.blocks,
+        text: result.text,
+      });
+    }
+  },
+).addBlockActionsHandler(
+  /^page_(prev|next)$/,
+  async ({ action, body, client }) => {
+    const parts = (action.value ?? "").split("::");
+    const tokenId = parts[0] || "";
+    const sessionTypeFilter = parts[1] || "all";
+    const currentPage = parseInt(parts[2] || "0", 10);
+    const userId = body.user.id;
+    const channelId = body.channel?.id ?? body.container?.channel_id ?? "";
+
+    const newPage = action.action_id === "page_next" ? currentPage + 1 : currentPage - 1;
+
+    const result = await fetchAndBuild(client, tokenId, Math.max(0, newPage), sessionTypeFilter);
+    if (result) {
+      await client.chat.postEphemeral({
+        channel: channelId,
+        user: userId,
+        blocks: result.blocks,
+        text: result.text,
+      });
+    }
   },
 ).addBlockActionsHandler(
   /^claim_/,
@@ -147,13 +196,21 @@ const getAvailable = SlackFunction(
     } else {
       const errMsg = (claimResult.data as Record<string, unknown>).error ??
         "Unknown error";
-      await postSessionList(
+      const result = await fetchAndBuild(
         client,
         tokenId,
-        userId,
-        channelId,
+        0,
+        "all",
         `:x: *Could not claim shift:* ${errMsg}. Here's the current list:`,
       );
+      if (result) {
+        await client.chat.postEphemeral({
+          channel: channelId,
+          user: userId,
+          blocks: result.blocks,
+          text: result.text,
+        });
+      }
     }
   },
 );

@@ -1,5 +1,11 @@
 {
   "apps": {
+    "E04SQG1CF60": {
+      "app_id": "A0B26E63J1W",
+      "enterprise_id": "E04SQG1CF60",
+      "team_domain": "salesforce-sandbox2",
+      "team_id": "E04SQG1CF60"
+    },
     "E0AKHGA1ME2": {
       "app_id": "A0B1E2W443E",
       "enterprise_id": "E0AKHGA1ME2",

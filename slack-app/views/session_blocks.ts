@@ -25,10 +25,14 @@ export interface MyShiftInfo {
   endTime: string;
 }
 
+const PAGE_SIZE = 5;
+
 export function sessionListBlocks(
   sessions: SessionData[],
   myShifts?: MyShiftInfo[],
   tokenId?: string,
+  page = 0,
+  sessionTypeFilter = "all",
 ): Record<string, unknown>[] {
   const needingStaff = sessions.filter((s) => s.needsStaff);
 
@@ -44,6 +48,16 @@ export function sessionListBlocks(
     ];
   }
 
+  const sessionTypes = [...new Set(needingStaff.map((s) => s.sessionType).filter(Boolean))].sort();
+
+  const filtered = sessionTypeFilter === "all"
+    ? needingStaff
+    : needingStaff.filter((s) => s.sessionType === sessionTypeFilter);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageSlice = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
   const mySlotKeys = new Set<string>();
   if (myShifts) {
     for (const s of myShifts) {
@@ -53,7 +67,35 @@ export function sessionListBlocks(
 
   const blocks: Record<string, unknown>[] = [];
 
-  for (const session of needingStaff.slice(0, 10)) {
+  const filterOptions = [
+    { text: { type: "plain_text" as const, text: "All Types" }, value: "all" },
+    ...sessionTypes.map((t) => ({
+      text: { type: "plain_text" as const, text: t },
+      value: t,
+    })),
+  ];
+
+  const stateValue = tokenId ? `${tokenId}::${sessionTypeFilter}::${safePage}` : "";
+
+  blocks.push({
+    type: "section",
+    block_id: `filter_ctx::${tokenId ?? ""}`,
+    text: {
+      type: "mrkdwn",
+      text: `*Filter by type:*  |  Showing ${filtered.length} session(s)  |  Page ${safePage + 1}/${totalPages}`,
+    },
+    accessory: {
+      type: "static_select",
+      action_id: "filter_session_type",
+      placeholder: { type: "plain_text", text: "Session Type" },
+      options: filterOptions,
+      initial_option: filterOptions.find((o) => o.value === sessionTypeFilter) ?? filterOptions[0],
+    },
+  });
+
+  blocks.push({ type: "divider" });
+
+  for (const session of pageSlice) {
     const unclaimedShifts = session.shifts.filter((s) => {
       if (s.isClaimed) return false;
       if (myShifts) {
@@ -124,5 +166,29 @@ export function sessionListBlocks(
     blocks.push({ type: "divider" });
   }
 
+  if (totalPages > 1) {
+    const navButtons: Record<string, unknown>[] = [];
+    if (safePage > 0) {
+      navButtons.push({
+        type: "button",
+        text: { type: "plain_text", text: ":arrow_left: Previous" },
+        action_id: "page_prev",
+        value: stateValue,
+      });
+    }
+    if (safePage < totalPages - 1) {
+      navButtons.push({
+        type: "button",
+        text: { type: "plain_text", text: "Next :arrow_right:" },
+        action_id: "page_next",
+        value: stateValue,
+      });
+    }
+    if (navButtons.length > 0) {
+      blocks.push({ type: "actions", elements: navButtons });
+    }
+  }
+
   return blocks;
 }
+
