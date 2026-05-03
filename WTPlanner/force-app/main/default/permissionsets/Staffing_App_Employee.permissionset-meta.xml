@@ -85,6 +85,34 @@
         <apexClass>ShiftTriggerHandler</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>StaffingAPI_MyShifts</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>StaffingAPI_AvailableSessions</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>StaffingAPI_ClaimShift</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>StaffingAPI_DropShift</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>StaffingAPI_CheckOverlaps</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>StaffingAPI_CheckShiftOverlap</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>StaffingAPI_Digest</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
 
     <!-- Session_Type__c permissions (Read Only) -->
     <fieldPermissions>
