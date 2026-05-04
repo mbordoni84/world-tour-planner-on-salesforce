@@ -5,6 +5,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Slack Shift Webhook URL</shortDescription>
-        <value>REPLACE_WITH_WEBHOOK_URL</value>
+        <value>https://hooks.slack.com/triggers/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</value>
     </labels>
 </CustomLabels>

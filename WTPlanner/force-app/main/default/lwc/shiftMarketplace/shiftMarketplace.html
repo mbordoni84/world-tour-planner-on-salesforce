@@ -1,6 +1,15 @@
 <template>
     <lightning-card title="Shift Marketplace" icon-name="standard:event">
         <div slot="actions">
+            <template if:true={isAdmin}>
+                <lightning-button
+                    label="+ New User"
+                    icon-name="utility:new"
+                    onclick={handleOpenCreateUser}
+                    variant="brand"
+                    class="slds-m-right_x-small"
+                ></lightning-button>
+            </template>
             <lightning-button
                 label="Refresh"
                 icon-name="utility:refresh"
@@ -243,4 +252,11 @@
             </template>
         </div>
     </lightning-card>
+
+    <template if:true={showCreateUserModal}>
+        <c-quick-user-create
+            onusercreated={handleUserCreated}
+            oncancel={handleCreateUserCancel}
+        ></c-quick-user-create>
+    </template>
 </template>

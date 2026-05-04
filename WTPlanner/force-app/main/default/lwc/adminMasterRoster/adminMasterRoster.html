@@ -96,8 +96,7 @@
 
                     <template if:true={hasPersonRoster}>
                         <div class="roster-matrix-container">
-                            <div class="slds-scrollable_x">
-                                <table class="slds-table slds-table_bordered slds-table_fixed-layout roster-table">
+                                <table class="slds-table slds-table_bordered roster-table">
                                     <thead>
                                         <tr class="slds-line-height_reset">
                                             <th class="sticky-col" scope="col">
@@ -119,38 +118,46 @@
                                                 <template for:each={row.slotCells} for:item="cell">
                                                     <td key={cell.key}>
                                                         <template if:true={cell.hasValue}>
-                                                            <div class="popover-container">
-                                                                <lightning-badge label={cell.value}></lightning-badge>
-                                                                <template if:true={cell.hasOverlap}>
-                                                                    <lightning-icon
-                                                                        icon-name="utility:warning"
-                                                                        size="xx-small"
-                                                                        variant="warning"
-                                                                        class="slds-m-left_xx-small overlap-icon"
-                                                                    ></lightning-icon>
-                                                                </template>
+                                                            <div class="popover-container"
+                                                                 onmouseenter={handlePopoverShow}
+                                                                 onmouseleave={handlePopoverHide}>
+                                                                <div class="cell-badges">
+                                                                    <template for:each={cell.items} for:item="item">
+                                                                        <div key={item.key} class="badge-row">
+                                                                            <lightning-badge label={item.badgeLabel}></lightning-badge>
+                                                                            <template if:true={item.hasOverlap}>
+                                                                                <lightning-icon
+                                                                                    icon-name="utility:warning"
+                                                                                    size="xx-small"
+                                                                                    variant="warning"
+                                                                                    class="slds-m-left_xx-small overlap-icon"
+                                                                                ></lightning-icon>
+                                                                            </template>
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
                                                                 <div class="popover-content" role="tooltip">
-                                                                    <div class="popover-header">{cell.value}</div>
-                                                                    <div class="popover-row">
-                                                                        <span class="popover-label">Type:</span>
-                                                                        <span>{cell.sessionType}</span>
-                                                                    </div>
-                                                                    <div class="popover-row">
-                                                                        <span class="popover-label">Time:</span>
-                                                                        <span>{cell.timeRange}</span>
-                                                                    </div>
-                                                                    <div class="popover-row">
-                                                                        <span class="popover-label">Location:</span>
-                                                                        <span>{cell.location}</span>
-                                                                    </div>
-                                                                    <div class="popover-row">
-                                                                        <span class="popover-label">Staffing:</span>
-                                                                        <span>{cell.staffingLabel}</span>
-                                                                    </div>
-                                                                    <div class="popover-row">
-                                                                        <span class="popover-label">Status:</span>
-                                                                        <span class={cell.statusClass}>{cell.status}</span>
-                                                                    </div>
+                                                                    <template for:each={cell.items} for:item="item">
+                                                                        <div key={item.key} class="popover-session">
+                                                                            <div class="popover-header">{item.badgeLabel}</div>
+                                                                            <div class="popover-row">
+                                                                                <span class="popover-label">Time:</span>
+                                                                                <span>{item.timeRange}</span>
+                                                                            </div>
+                                                                            <div class="popover-row">
+                                                                                <span class="popover-label">Location:</span>
+                                                                                <span>{item.location}</span>
+                                                                            </div>
+                                                                            <div class="popover-row">
+                                                                                <span class="popover-label">Staffing:</span>
+                                                                                <span>{item.staffingLabel}</span>
+                                                                            </div>
+                                                                            <div class="popover-row">
+                                                                                <span class="popover-label">Status:</span>
+                                                                                <span class={item.statusClass}>{item.status}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
                                                                 </div>
                                                             </div>
                                                         </template>
@@ -160,7 +167,6 @@
                                         </template>
                                     </tbody>
                                 </table>
-                            </div>
                         </div>
                     </template>
 
@@ -178,50 +184,48 @@
                     </template>
 
                     <template if:true={hasShiftRoster}>
-                        <div class="shifts-list">
-                            <template for:each={filteredShifts} for:item="shift">
-                                <div key={shift.id}>
-                                    <article class="slds-card shift-roster-card">
-                                        <div class="slds-card__header">
-                                            <div class="slds-media slds-media_center">
-                                                <div class="slds-media__body">
-                                                    <h3 class="slds-card__header-title">
-                                                        <span class="shift-title">{shift.sessionName}</span>
-                                                    </h3>
-                                                    <p class="slds-text-body_small slds-text-color_weak">
-                                                        {shift.sessionLocation} &bull; {shift.timeSlot}
-                                                    </p>
-                                                </div>
-                                                <div class="slds-no-flex">
-                                                    <lightning-badge label={shift.sessionType}></lightning-badge>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="slds-card__body slds-card__body_inner">
-                                            <template if:true={shift.isAssigned}>
-                                                <div class="slds-m-top_small">
-                                                    <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">
-                                                        Assigned:
-                                                    </p>
-                                                    <div class="assigned-user">
-                                                        <lightning-icon icon-name="standard:avatar" size="x-small"></lightning-icon>
+                        <div class="shift-table-container">
+                            <table class="slds-table slds-table_bordered slds-table_striped shift-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Session</th>
+                                        <th scope="col">Location</th>
+                                        <th scope="col">Time Slot</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Assigned To</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={filteredShifts} for:item="shift">
+                                        <tr key={shift.id}>
+                                            <td>
+                                                <span class="shift-session-name">{shift.sessionName}</span>
+                                            </td>
+                                            <td class="slds-text-color_weak">{shift.sessionLocation}</td>
+                                            <td>
+                                                <span class="shift-time-slot">{shift.timeSlot}</span>
+                                            </td>
+                                            <td>
+                                                <lightning-badge label={shift.sessionType}></lightning-badge>
+                                            </td>
+                                            <td>
+                                                <template if:true={shift.isAssigned}>
+                                                    <div class="assigned-user-inline">
+                                                        <lightning-icon icon-name="standard:avatar" size="xx-small"></lightning-icon>
                                                         <span>{shift.assignedUserName}</span>
                                                         <template if:true={shift.hasOverlap}>
-                                                            <lightning-badge label="Overlap" variant="warning"></lightning-badge>
+                                                            <lightning-badge label="Overlap" variant="warning" class="slds-m-left_xx-small"></lightning-badge>
                                                         </template>
                                                     </div>
-                                                </div>
-                                            </template>
-
-                                            <template if:false={shift.isAssigned}>
-                                                <div class="slds-text-align_center slds-m-top_small slds-text-color_weak">
-                                                    <p class="slds-text-body_small">Unassigned</p>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </article>
-                                </div>
-                            </template>
+                                                </template>
+                                                <template if:false={shift.isAssigned}>
+                                                    <span class="unassigned-label">Unassigned</span>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
                         </div>
                     </template>
 

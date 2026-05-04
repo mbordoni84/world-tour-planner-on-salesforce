@@ -71,17 +71,16 @@ public with sharing class AdminRosterController {
 
                 Map<String, String> cellData = new Map<String, String>();
                 Map<String, CellDetail> cellDetails = new Map<String, CellDetail>();
+                Map<String, List<CellDetail>> cellDetailsList = new Map<String, List<CellDetail>>();
 
                 for (Shift__c shift : userShifts) {
                     String timeSlot = formatTimeSlot(shift.Start_Time__c, shift.End_Time__c);
-                    cellData.put(timeSlot, shift.Session__r.Name);
 
                     Id sessId = shift.Session__c;
                     String slotKey = sessId + ':' + String.valueOf(shift.Start_Time__c) + '-' + String.valueOf(shift.End_Time__c);
                     Integer slotClaimed = claimedBySessionSlot.containsKey(slotKey) ? claimedBySessionSlot.get(slotKey) : 0;
                     Integer minS = shift.Session__r.Min_Shifts__c != null ? (Integer)shift.Session__r.Min_Shifts__c : 1;
                     Integer maxS = shift.Session__r.Max_Shifts__c != null ? (Integer)shift.Session__r.Max_Shifts__c : 5;
-                    Integer slotTotal = totalBySessionSlot.containsKey(slotKey) ? totalBySessionSlot.get(slotKey) : 0;
                     String staffStatus = slotClaimed < minS ? 'Needs Staff' : 'Fully Staffed';
                     Boolean hasSessionOverlap = overlapBySession.containsKey(sessId) && overlapBySession.get(sessId);
 
@@ -95,10 +94,22 @@ public with sharing class AdminRosterController {
                     detail.minReached = slotClaimed >= minS;
                     detail.hasOverlap = shift.Has_Overlap__c;
                     detail.sessionHasOverlap = hasSessionOverlap;
-                    cellDetails.put(timeSlot, detail);
+
+                    if (!cellDetailsList.containsKey(timeSlot)) {
+                        cellDetailsList.put(timeSlot, new List<CellDetail>());
+                    }
+                    cellDetailsList.get(timeSlot).add(detail);
+
+                    if (!cellData.containsKey(timeSlot)) {
+                        cellData.put(timeSlot, shift.Session__r.Name);
+                        cellDetails.put(timeSlot, detail);
+                    } else {
+                        cellData.put(timeSlot, cellData.get(timeSlot) + ' + ' + shift.Session__r.Name);
+                        cellDetails.put(timeSlot, detail);
+                    }
                 }
 
-                rows.add(new RosterRow(usersMap.get(userId).Name, cellData, cellDetails));
+                rows.add(new RosterRow(usersMap.get(userId).Name, cellData, cellDetails, cellDetailsList));
             }
 
             // Build "By Shift" wrappers
@@ -156,11 +167,13 @@ public with sharing class AdminRosterController {
         @AuraEnabled public String userName {get; set;}
         @AuraEnabled public Map<String, String> cells {get; set;}
         @AuraEnabled public Map<String, CellDetail> cellDetails {get; set;}
+        @AuraEnabled public Map<String, List<CellDetail>> cellDetailsList {get; set;}
 
-        public RosterRow(String userName, Map<String, String> cells, Map<String, CellDetail> cellDetails) {
+        public RosterRow(String userName, Map<String, String> cells, Map<String, CellDetail> cellDetails, Map<String, List<CellDetail>> cellDetailsList) {
             this.userName = userName;
             this.cells = cells;
             this.cellDetails = cellDetails;
+            this.cellDetailsList = cellDetailsList;
         }
     }
 

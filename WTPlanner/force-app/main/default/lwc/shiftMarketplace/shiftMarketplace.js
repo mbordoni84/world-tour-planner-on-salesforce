@@ -22,6 +22,8 @@ export default class ShiftMarketplace extends LightningElement {
     isAdmin = false;
     eligibleUsers = [];
     overlapsByShift = {};
+    @track showCreateUserModal = false;
+    wiredEligibleUsersResult;
 
     // Filters
     @track selectedSessionType = '';
@@ -51,9 +53,10 @@ export default class ShiftMarketplace extends LightningElement {
     }
 
     @wire(getEligibleUsers)
-    wiredEligibleUsers({ data }) {
-        if (data) {
-            this.eligibleUsers = data;
+    wiredEligibleUsers(result) {
+        this.wiredEligibleUsersResult = result;
+        if (result.data) {
+            this.eligibleUsers = result.data;
         }
     }
 
@@ -389,5 +392,18 @@ export default class ShiftMarketplace extends LightningElement {
     get hasActiveFilters() {
         return !!(this.selectedSessionType || this.selectedLocation ||
             this.selectedStatus || this.searchText || this.hideFullyStaffed);
+    }
+
+    handleOpenCreateUser() {
+        this.showCreateUserModal = true;
+    }
+
+    handleCreateUserCancel() {
+        this.showCreateUserModal = false;
+    }
+
+    async handleUserCreated() {
+        this.showCreateUserModal = false;
+        await refreshApex(this.wiredEligibleUsersResult);
     }
 }

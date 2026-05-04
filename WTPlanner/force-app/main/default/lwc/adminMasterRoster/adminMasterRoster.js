@@ -150,30 +150,43 @@ export default class AdminMasterRoster extends LightningElement {
 
             const slotCells = slots.map(slot => {
                 const hasRawValue = !!(row.cells && row.cells[slot]);
-                const detail = row.cellDetails ? row.cellDetails[slot] : null;
-                const passesFilter = hasRawValue && this.cellPassesFilter(detail);
+                const detailsList = row.cellDetailsList ? row.cellDetailsList[slot] : null;
+                const details = detailsList || [];
+                const anyPassesFilter = hasRawValue && details.some(d => this.cellPassesFilter(d));
 
-                let statusClass = '';
-                if (detail && detail.status === 'Needs Staff') {
-                    statusClass = 'popover-status-danger';
-                } else if (detail && detail.status === 'Fully Staffed') {
-                    statusClass = 'popover-status-muted';
-                } else if (detail) {
-                    statusClass = 'popover-status-success';
-                }
+                const items = details.filter(d => this.cellPassesFilter(d)).map((detail, idx) => {
+                    let statusClass = '';
+                    if (detail.status === 'Needs Staff') {
+                        statusClass = 'popover-status-danger';
+                    } else if (detail.status === 'Fully Staffed') {
+                        statusClass = 'popover-status-muted';
+                    } else {
+                        statusClass = 'popover-status-success';
+                    }
+                    const badgeLabel = detail.sessionType
+                        ? `${detail.sessionName} (${detail.sessionType})`
+                        : detail.sessionName;
+
+                    return {
+                        key: row.userName + '-' + slot + '-' + idx,
+                        value: detail.sessionName,
+                        badgeLabel,
+                        sessionType: detail.sessionType || '',
+                        timeRange: detail.timeRange || '',
+                        location: detail.location || '',
+                        staffingLabel: detail.staffingLabel || '',
+                        status: detail.status || '',
+                        statusClass,
+                        hasOverlap: detail.hasOverlap || false
+                    };
+                });
 
                 return {
                     key: row.userName + '-' + slot,
                     slot,
-                    value: passesFilter ? row.cells[slot] : null,
-                    hasValue: passesFilter,
-                    sessionType: detail ? detail.sessionType : '',
-                    timeRange: detail ? detail.timeRange : '',
-                    location: detail ? detail.location : '',
-                    staffingLabel: detail ? detail.staffingLabel : '',
-                    status: detail ? detail.status : '',
-                    statusClass,
-                    hasOverlap: detail ? detail.hasOverlap : false
+                    hasValue: anyPassesFilter,
+                    items,
+                    hasOverlap: items.some(i => i.hasOverlap)
                 };
             });
 
@@ -211,6 +224,21 @@ export default class AdminMasterRoster extends LightningElement {
 
     get hasShiftRoster() {
         return this.filteredShifts.length > 0;
+    }
+
+    handlePopoverShow(event) {
+        const container = event.currentTarget;
+        const popover = container.querySelector('.popover-content');
+        if (!popover) return;
+
+        const rect = container.getBoundingClientRect();
+        popover.style.left = rect.left + rect.width / 2 + 'px';
+        popover.style.transform = 'translateX(-50%)';
+        popover.style.top = rect.bottom + 8 + 'px';
+    }
+
+    handlePopoverHide() {
+        // CSS handles hide via .popover-container:hover
     }
 
     get hasActiveFilters() {

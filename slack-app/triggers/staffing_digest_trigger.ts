@@ -8,7 +8,7 @@ const dailyDigestTestTrigger: Trigger<typeof DailyDigestWorkflow.definition> = {
   description: "Post the staffing overview to channel and personal DMs on demand",
   workflow: `#/workflows/${DailyDigestWorkflow.definition.callback_id}`,
   inputs: {
-    channel_id: { value: "C0B1RQLJS81" },
+    channel_id: { value: TriggerContextData.Shortcut.channel_id },
   },
 };
 
