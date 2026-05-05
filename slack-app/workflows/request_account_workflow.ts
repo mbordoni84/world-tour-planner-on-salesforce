@@ -17,7 +17,7 @@ RequestAccountWorkflow.addStep(RequestAccountDefinition, {
   user_id: RequestAccountWorkflow.inputs.user_id,
   channel_id: RequestAccountWorkflow.inputs.channel_id,
   sf_token_id: {
-    credential_source: "END_USER",
+    credential_source: "DEVELOPER",
   },
 });
 
