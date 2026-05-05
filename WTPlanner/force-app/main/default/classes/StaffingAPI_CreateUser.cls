@@ -22,10 +22,18 @@ global without sharing class StaffingAPI_CreateUser {
             }
 
             List<User> existing = [
-                SELECT Id FROM User WHERE Email = :email.trim() AND IsActive = true LIMIT 1
+                SELECT Id, Username FROM User WHERE Email = :email.trim() AND IsActive = true LIMIT 1
             ];
             if (!existing.isEmpty()) {
-                sendError(res, 400, 'A user with email ' + email + ' already exists.');
+                res.statusCode = 400;
+                res.responseBody = Blob.valueOf(JSON.serialize(
+                    new Map<String, Object>{
+                        'success' => false,
+                        'error' => 'DUPLICATE_EMAIL',
+                        'username' => existing[0].Username,
+                        'email' => email.trim()
+                    }
+                ));
                 return;
             }
 

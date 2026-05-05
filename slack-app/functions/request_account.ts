@@ -239,21 +239,46 @@ const requestAccount = SlackFunction(
       });
     } else {
       const rawData = result.data as Record<string, unknown>;
-      const errMsg = rawData?.error || rawData?.message || JSON.stringify(rawData) || "Unknown error";
-      await client.chat.update({
-        channel: channelId,
-        ts: body.message?.ts || "",
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `:x: *Failed to create account*\n*Name:* ${firstName} ${lastName}\n*Email:* ${email}\n*Error:* ${errMsg}`,
+      const errCode = rawData?.error || "";
+      const existingUsername = rawData?.username || "";
+
+      if (errCode === "DUPLICATE_EMAIL" && existingUsername) {
+        await client.chat.update({
+          channel: channelId,
+          ts: body.message?.ts || "",
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: `:information_source: *Account already exists*\n*Name:* ${firstName} ${lastName}\n*Email:* ${email}\n*Username:* ${existingUsername}`,
+              },
             },
-          },
-        ],
-        text: `Account creation failed for ${firstName} ${lastName}`,
-      });
+          ],
+          text: `Account already exists for ${firstName} ${lastName}`,
+        });
+
+        await client.chat.postMessage({
+          channel: requesterId,
+          text: `:wave: You already have a staffing account!\n\n*Username:* ${existingUsername}\n*Login:* https://storm-973b1cdf0acdf3.my.salesforce.com/\n*Forgot password:* https://storm-973b1cdf0acdf3.my.salesforce.com/secur/forgotpassword.jsp?locale=us\n\nFor help, ask in <#${approvalChannel}>.`,
+        });
+      } else {
+        const errMsg = rawData?.message || errCode || JSON.stringify(rawData) || "Unknown error";
+        await client.chat.update({
+          channel: channelId,
+          ts: body.message?.ts || "",
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: `:x: *Failed to create account*\n*Name:* ${firstName} ${lastName}\n*Email:* ${email}\n*Error:* ${errMsg}`,
+              },
+            },
+          ],
+          text: `Account creation failed for ${firstName} ${lastName}`,
+        });
+      }
     }
   },
 ).addBlockActionsHandler(
