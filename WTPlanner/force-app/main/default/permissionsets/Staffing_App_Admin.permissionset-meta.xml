@@ -6,6 +6,10 @@
 
     <!-- Apex class access -->
     <classAccesses>
+        <apexClass>StaffingAPI_CreateUser</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>QuickUserCreateController</apexClass>
         <enabled>true</enabled>
     </classAccesses>

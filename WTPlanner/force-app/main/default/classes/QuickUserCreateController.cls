@@ -22,6 +22,7 @@ public without sharing class QuickUserCreateController {
             String orgId = UserInfo.getOrganizationId();
             String baseUsername = firstName.toLowerCase().replaceAll('[^a-z]', '')
                 + '.' + lastName.toLowerCase().replaceAll('[^a-z]', '')
+                + '.' + String.valueOf(System.currentTimeMillis())
                 + '@staffingapp.' + orgId + '.sfdc';
 
             String alias = (firstName.substring(0, Math.min(firstName.length(), 7))
@@ -60,7 +61,7 @@ public without sharing class QuickUserCreateController {
                 insert assignments;
             }
 
-            System.resetPassword(newUser.Id, true);
+            resetPasswordAsync(newUser.Id);
 
             return new UserResult(newUser.Id, firstName.trim() + ' ' + lastName.trim(), baseUsername);
         } catch (DmlException e) {
@@ -73,6 +74,11 @@ public without sharing class QuickUserCreateController {
         } catch (Exception e) {
             throw buildException('Error creating user: ' + e.getMessage());
         }
+    }
+
+    @future
+    public static void resetPasswordAsync(Id userId) {
+        System.resetPassword(userId, true);
     }
 
     private static AuraHandledException buildException(String message) {
