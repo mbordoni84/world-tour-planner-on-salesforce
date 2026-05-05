@@ -107,6 +107,8 @@ slack deploy
 
 Select the target workspace when prompted.
 
+**Important:** After every `slack deploy`, you must re-run `slack external-auth select-auth` to reassign the service account to the Request Account workflow. Deploys can reset the auth selection.
+
 ### 3.3 Add OAuth Client Secret
 
 Use the Consumer Secret from Part 2:
