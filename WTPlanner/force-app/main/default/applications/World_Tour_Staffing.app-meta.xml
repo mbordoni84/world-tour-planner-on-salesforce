@@ -21,6 +21,7 @@
     <tabs>My_Schedule</tabs>
     <tabs>Overlap_Dashboard</tabs>
     <tabs>Master_Roster</tabs>
+    <tabs>Freeze_Control</tabs>
     <profileActionOverrides>
         <actionName>Tab</actionName>
         <content>Staffing_Home_Page</content>

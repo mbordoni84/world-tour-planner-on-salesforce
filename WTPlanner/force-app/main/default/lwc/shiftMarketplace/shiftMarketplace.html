@@ -116,6 +116,9 @@
                                             </h3>
                                         </div>
                                         <div class="slds-grid slds-grid_vertical-align-center header-actions">
+                                            <template if:true={session.isFrozen}>
+                                                <lightning-badge label="Frozen" class="slds-m-right_small frozen-badge"></lightning-badge>
+                                            </template>
                                             <lightning-badge label={session.sessionType} class="slds-m-right_small"></lightning-badge>
                                             <span class="staffing-label">{session.staffingStatus}</span>
                                         </div>

@@ -13,6 +13,10 @@
         <apexClass>QuickUserCreateController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>FreezeControlController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
 
     <!-- App visibility -->
     <applicationVisibilities>
@@ -57,11 +61,20 @@
         <tab>Staffing_Dashboard</tab>
         <visibility>Visible</visibility>
     </tabSettings>
+    <tabSettings>
+        <tab>Freeze_Control</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 
     <!-- Session_Type__c permissions -->
     <fieldPermissions>
         <editable>true</editable>
         <field>Session_Type__c.Description__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Session_Type__c.Is_Frozen__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
@@ -99,6 +112,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Session__c.Skills__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Session__c.Is_Frozen__c</field>
         <readable>true</readable>
     </fieldPermissions>
 

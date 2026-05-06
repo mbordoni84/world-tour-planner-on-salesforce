@@ -23,7 +23,7 @@ public with sharing class AgentAction_ClaimShift {
 
         try {
             List<Session__c> sessions = [
-                SELECT Id, Name FROM Session__c
+                SELECT Id, Name, Is_Frozen__c, Session_Type__r.Is_Frozen__c FROM Session__c
                 WHERE Name LIKE :('%' + sessionName + '%')
                 LIMIT 1
             ];
@@ -31,6 +31,13 @@ public with sharing class AgentAction_ClaimShift {
             if (sessions.isEmpty()) {
                 result.success = false;
                 result.message = 'No session found matching "' + sessionName + '".';
+                return new List<Result>{ result };
+            }
+
+            Session__c foundSession = sessions[0];
+            if (foundSession.Is_Frozen__c || (foundSession.Session_Type__r != null && foundSession.Session_Type__r.Is_Frozen__c)) {
+                result.success = false;
+                result.message = 'Session "' + foundSession.Name + '" is currently frozen. You cannot claim shifts.';
                 return new List<Result>{ result };
             }
 

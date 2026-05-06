@@ -47,7 +47,8 @@ export default class MySchedule extends NavigationMixin(LightningElement) {
         return data.map(shift => ({
             ...shift,
             hasOverlapClass: shift.hasOverlap ? 'has-overlap' : '',
-            shiftTime: `${shift.startTime} - ${shift.endTime}`
+            shiftTime: `${shift.startTime} - ${shift.endTime}`,
+            isFrozen: shift.isSessionFrozen
         }));
     }
 

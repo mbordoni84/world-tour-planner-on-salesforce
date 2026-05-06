@@ -76,13 +76,18 @@
                                 </div>
                                 <template if:false={isViewingOtherUser}>
                                     <div class="slds-card__footer">
-                                        <lightning-button
-                                            label="Drop Shift"
-                                            variant="destructive-text"
-                                            data-id={shift.id}
-                                            data-name={shift.sessionName}
-                                            onclick={handleDropShift}
-                                        ></lightning-button>
+                                        <template if:true={shift.isFrozen}>
+                                            <lightning-badge label="Frozen — cannot drop" class="frozen-badge"></lightning-badge>
+                                        </template>
+                                        <template if:false={shift.isFrozen}>
+                                            <lightning-button
+                                                label="Drop Shift"
+                                                variant="destructive-text"
+                                                data-id={shift.id}
+                                                data-name={shift.sessionName}
+                                                onclick={handleDropShift}
+                                            ></lightning-button>
+                                        </template>
                                     </div>
                                 </template>
                             </article>

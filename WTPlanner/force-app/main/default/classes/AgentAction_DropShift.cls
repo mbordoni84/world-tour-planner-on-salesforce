@@ -23,7 +23,8 @@ public with sharing class AgentAction_DropShift {
 
         try {
             List<Shift__c> myShifts = [
-                SELECT Id, Start_Time__c, End_Time__c, Session__r.Name
+                SELECT Id, Start_Time__c, End_Time__c, Session__c,
+                       Session__r.Name, Session__r.Is_Frozen__c, Session__r.Session_Type__r.Is_Frozen__c
                 FROM Shift__c
                 WHERE User__c = :UserInfo.getUserId()
                   AND Session__r.Name LIKE :('%' + sessionName + '%')
@@ -37,6 +38,12 @@ public with sharing class AgentAction_DropShift {
             }
 
             Shift__c shift = myShifts[0];
+            if (shift.Session__r.Is_Frozen__c || (shift.Session__r.Session_Type__r != null && shift.Session__r.Session_Type__r.Is_Frozen__c)) {
+                result.success = false;
+                result.message = 'Session "' + shift.Session__r.Name + '" is currently frozen. You cannot drop shifts.';
+                return new List<Result>{ result };
+            }
+
             shift.User__c = null;
             update shift;
 

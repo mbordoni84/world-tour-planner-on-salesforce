@@ -57,7 +57,7 @@ public with sharing class OverlapDashboardController {
     public static void dropShift(String shiftId) {
         try {
             Shift__c shift = [
-                SELECT Id, User__c FROM Shift__c
+                SELECT Id, User__c, Session__c FROM Shift__c
                 WHERE Id = :shiftId
                 LIMIT 1
             ];
@@ -67,8 +67,16 @@ public with sharing class OverlapDashboardController {
                 throw new AuraHandledException('You can only drop your own shifts');
             }
 
+            if (!isAdmin && ShiftMarketplaceController.isSessionFrozen(shift.Session__c)) {
+                AuraHandledException ex = new AuraHandledException('This session is currently frozen. You cannot drop shifts.');
+                ex.setMessage('This session is currently frozen. You cannot drop shifts.');
+                throw ex;
+            }
+
             shift.User__c = null;
             update shift;
+        } catch (AuraHandledException e) {
+            throw e;
         } catch (Exception e) {
             throw new AuraHandledException('Error dropping shift: ' + e.getMessage());
         }

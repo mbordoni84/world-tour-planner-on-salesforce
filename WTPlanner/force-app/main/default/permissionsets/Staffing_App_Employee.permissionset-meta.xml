@@ -120,6 +120,11 @@
         <field>Session_Type__c.Description__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Session_Type__c.Is_Frozen__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
 
     <!-- Session__c permissions (Read Only) -->
     <fieldPermissions>
@@ -155,6 +160,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Session__c.Skills__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Session__c.Is_Frozen__c</field>
         <readable>true</readable>
     </fieldPermissions>
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Freeze Control Panel for admins to freeze/unfreeze sessions</description>
+    <label>Freeze Control</label>
+    <auraComponent>FreezeControlPanelPage</auraComponent>
+    <motif>Custom50: Lock</motif>
+</CustomTab>

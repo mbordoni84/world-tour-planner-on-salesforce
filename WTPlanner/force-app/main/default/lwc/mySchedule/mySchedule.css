@@ -60,6 +60,12 @@
     padding: 3rem 1rem;
 }
 
+/* Frozen badge */
+.frozen-badge {
+    --slds-c-badge-color-background: #d8edff;
+    --slds-c-badge-text-color: #0176d3;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
     .assignment-card {

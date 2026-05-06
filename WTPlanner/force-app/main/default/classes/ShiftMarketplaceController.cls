@@ -6,6 +6,7 @@ public with sharing class ShiftMarketplaceController {
             List<Session__c> sessions = [
                 SELECT Id, Name, Location__c, Description__c,
                        Min_Shifts__c, Max_Shifts__c,
+                       Is_Frozen__c, Session_Type__r.Is_Frozen__c,
                        Session_Type__r.Name,
                        (SELECT Id, Name, Start_Time__c, End_Time__c,
                                User__c, User__r.Name, Has_Overlap__c
@@ -15,9 +16,14 @@ public with sharing class ShiftMarketplaceController {
                 ORDER BY Name
             ];
 
+            Boolean userIsAdmin = isCurrentUserAdmin();
             List<SessionWrapper> wrappers = new List<SessionWrapper>();
             for (Session__c session : sessions) {
-                wrappers.add(new SessionWrapper(session));
+                SessionWrapper wrapper = new SessionWrapper(session);
+                if (!userIsAdmin && wrapper.isFrozen) {
+                    continue;
+                }
+                wrappers.add(wrapper);
             }
             return wrappers;
         } catch (Exception e) {
@@ -38,7 +44,9 @@ public with sharing class ShiftMarketplaceController {
                        User__c, User__r.Name, Has_Overlap__c,
                        Session__r.Name, Session__r.Location__c,
                        Session__r.Description__c,
-                       Session__r.Session_Type__r.Name
+                       Session__r.Is_Frozen__c,
+                       Session__r.Session_Type__r.Name,
+                       Session__r.Session_Type__r.Is_Frozen__c
                 FROM Shift__c
                 WHERE User__c = :userId
                 ORDER BY Start_Time__c
@@ -58,11 +66,17 @@ public with sharing class ShiftMarketplaceController {
     public static String claimShift(String shiftId) {
         try {
             Shift__c shift = [
-                SELECT Id, User__c
+                SELECT Id, User__c, Session__c
                 FROM Shift__c
                 WHERE Id = :shiftId
                 LIMIT 1
             ];
+
+            if (!isCurrentUserAdmin() && isSessionFrozen(shift.Session__c)) {
+                AuraHandledException ex = new AuraHandledException('This session is currently frozen. You cannot claim shifts.');
+                ex.setMessage('This session is currently frozen. You cannot claim shifts.');
+                throw ex;
+            }
 
             if (shift.User__c != null) {
                 AuraHandledException ex = new AuraHandledException('This shift is already claimed');
@@ -84,6 +98,12 @@ public with sharing class ShiftMarketplaceController {
     @AuraEnabled
     public static String quickAssign(String sessionId) {
         try {
+            if (!isCurrentUserAdmin() && isSessionFrozen(sessionId)) {
+                AuraHandledException ex = new AuraHandledException('This session is currently frozen. You cannot claim shifts.');
+                ex.setMessage('This session is currently frozen. You cannot claim shifts.');
+                throw ex;
+            }
+
             // Find the first unclaimed shift for this session
             List<Shift__c> availableShifts = [
                 SELECT Id, User__c
@@ -149,11 +169,17 @@ public with sharing class ShiftMarketplaceController {
     public static void dropShift(String shiftId) {
         try {
             Shift__c shift = [
-                SELECT Id, User__c
+                SELECT Id, User__c, Session__c
                 FROM Shift__c
                 WHERE Id = :shiftId
                 LIMIT 1
             ];
+
+            if (!isCurrentUserAdmin() && isSessionFrozen(shift.Session__c)) {
+                AuraHandledException ex = new AuraHandledException('This session is currently frozen. You cannot drop shifts.');
+                ex.setMessage('This session is currently frozen. You cannot drop shifts.');
+                throw ex;
+            }
 
             if (shift.User__c != UserInfo.getUserId()) {
                 AuraHandledException ex = new AuraHandledException('You can only drop your own shifts');
@@ -339,6 +365,16 @@ public with sharing class ShiftMarketplaceController {
         }
     }
 
+    public static Boolean isSessionFrozen(Id sessionId) {
+        Session__c session = [
+            SELECT Is_Frozen__c, Session_Type__r.Is_Frozen__c
+            FROM Session__c
+            WHERE Id = :sessionId
+            LIMIT 1
+        ];
+        return session.Is_Frozen__c || (session.Session_Type__r != null && session.Session_Type__r.Is_Frozen__c);
+    }
+
     private static String formatHHMM(Time t) {
         return String.valueOf(t.hour()).leftPad(2, '0') + ':' +
                String.valueOf(t.minute()).leftPad(2, '0');
@@ -367,6 +403,7 @@ public with sharing class ShiftMarketplaceController {
         @AuraEnabled public Boolean needsStaff {get; set;}
         @AuraEnabled public Boolean isFull {get; set;}
         @AuraEnabled public Boolean canAddShift {get; set;}
+        @AuraEnabled public Boolean isFrozen {get; set;}
         @AuraEnabled public String staffingStatus {get; set;}
         @AuraEnabled public List<ShiftDetail> shifts {get; set;}
 
@@ -376,6 +413,8 @@ public with sharing class ShiftMarketplaceController {
             this.location = session.Location__c;
             this.description = session.Description__c;
             this.sessionType = session.Session_Type__r.Name;
+            this.isFrozen = session.Is_Frozen__c ||
+                (session.Session_Type__r != null && session.Session_Type__r.Is_Frozen__c);
             this.minShifts = session.Min_Shifts__c != null ? (Integer)session.Min_Shifts__c : 1;
             this.maxShifts = session.Max_Shifts__c != null ? (Integer)session.Max_Shifts__c : 5;
 
@@ -464,6 +503,7 @@ public with sharing class ShiftMarketplaceController {
         @AuraEnabled public String sessionDescription {get; set;}
         @AuraEnabled public String assignedUserName {get; set;}
         @AuraEnabled public Boolean hasOverlap {get; set;}
+        @AuraEnabled public Boolean isSessionFrozen {get; set;}
 
         public ShiftWrapper(Shift__c shift) {
             this.id = shift.Id;
@@ -476,6 +516,8 @@ public with sharing class ShiftMarketplaceController {
             this.sessionDescription = shift.Session__r.Description__c;
             this.assignedUserName = shift.User__r?.Name;
             this.hasOverlap = shift.Has_Overlap__c;
+            this.isSessionFrozen = shift.Session__r.Is_Frozen__c ||
+                (shift.Session__r.Session_Type__r != null && shift.Session__r.Session_Type__r.Is_Frozen__c);
         }
     }
 

@@ -27,6 +27,7 @@ public with sharing class AgentAction_GetAvailableSessions {
         ];
 
         String query = 'SELECT Name, Location__c, Session_Type__r.Name, Min_Shifts__c, Max_Shifts__c, ' +
+                       'Is_Frozen__c, Session_Type__r.Is_Frozen__c, ' +
                        '(SELECT Id, Start_Time__c, End_Time__c, User__c FROM Shifts__r ORDER BY Start_Time__c) ' +
                        'FROM Session__c';
 
@@ -41,6 +42,9 @@ public with sharing class AgentAction_GetAvailableSessions {
         Integer count = 0;
 
         for (Session__c s : sessions) {
+            if (s.Is_Frozen__c || (s.Session_Type__r != null && s.Session_Type__r.Is_Frozen__c)) {
+                continue;
+            }
             List<String> availableShiftTimes = new List<String>();
 
             Map<String, Integer> claimedBySlot = new Map<String, Integer>();

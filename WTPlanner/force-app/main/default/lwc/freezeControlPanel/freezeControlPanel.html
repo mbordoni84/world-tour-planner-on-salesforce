@@ -1,0 +1,113 @@
+<template>
+    <lightning-card title="Freeze Control" icon-name="standard:lock">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+                variant="neutral"
+            ></lightning-button>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <template if:true={hasSessionTypes}>
+                <div class="slds-m-bottom_small">
+                    <p class="slds-text-body_small slds-text-color_weak">
+                        Toggle session types or individual sessions to freeze/unfreeze shift assignments for employees.
+                    </p>
+                </div>
+
+                <template for:each={sessionTypes} for:item="st">
+                    <div key={st.id} class="session-type-card slds-m-bottom_small">
+                        <div class="type-header slds-grid slds-grid_vertical-align-center slds-p-around_small">
+                            <div class="slds-col expand-toggle" data-id={st.id} onclick={handleToggleExpand}>
+                                <lightning-icon
+                                    icon-name={st.expandIcon}
+                                    size="x-small"
+                                    class="slds-m-right_x-small"
+                                ></lightning-icon>
+                                <span class="type-name">{st.name}</span>
+                                <span class="slds-text-body_small slds-text-color_weak slds-m-left_small">
+                                    ({st.sessionCount} sessions, {st.frozenSessionCount} frozen)
+                                </span>
+                            </div>
+                            <div class="slds-col_bump-left">
+                                <lightning-input
+                                    type="toggle"
+                                    label="Freeze Type"
+                                    variant="label-hidden"
+                                    checked={st.isFrozen}
+                                    data-id={st.id}
+                                    onchange={handleTypeToggle}
+                                    message-toggle-active="Frozen"
+                                    message-toggle-inactive="Active"
+                                ></lightning-input>
+                            </div>
+                        </div>
+
+                        <template if:true={st.isExpanded}>
+                            <div class="sessions-container slds-p-left_large slds-p-right_small slds-p-bottom_small">
+                                <div class="slds-grid slds-m-bottom_x-small bulk-actions">
+                                    <lightning-button
+                                        label="Freeze All"
+                                        variant="neutral"
+                                        icon-name="utility:lock"
+                                        data-id={st.id}
+                                        onclick={handleBulkFreeze}
+                                        class="slds-m-right_x-small"
+                                    ></lightning-button>
+                                    <lightning-button
+                                        label="Unfreeze All"
+                                        variant="neutral"
+                                        icon-name="utility:unlock"
+                                        data-id={st.id}
+                                        onclick={handleBulkUnfreeze}
+                                    ></lightning-button>
+                                </div>
+
+                                <template for:each={st.sessions} for:item="session">
+                                    <div key={session.id} class="session-row slds-grid slds-grid_vertical-align-center slds-p-vertical_xx-small">
+                                        <div class="slds-col">
+                                            <span class="session-name">{session.name}</span>
+                                            <template if:true={session.location}>
+                                                <span class="slds-text-body_small slds-text-color_weak slds-m-left_x-small">
+                                                    — {session.location}
+                                                </span>
+                                            </template>
+                                            <template if:true={session.inheritedFreeze}>
+                                                <lightning-badge label="Inherited" class="slds-m-left_x-small inherited-badge"></lightning-badge>
+                                            </template>
+                                        </div>
+                                        <div class="slds-col_bump-left">
+                                            <lightning-input
+                                                type="toggle"
+                                                label="Freeze Session"
+                                                variant="label-hidden"
+                                                checked={session.effectivelyFrozen}
+                                                data-id={session.id}
+                                                onchange={handleSessionToggle}
+                                                disabled={session.inheritedFreeze}
+                                                message-toggle-active="Frozen"
+                                                message-toggle-inactive="Active"
+                                            ></lightning-input>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </template>
+
+            <template if:false={hasSessionTypes}>
+                <div class="slds-text-align_center slds-p-vertical_large">
+                    <p class="slds-text-color_weak">No session types found.</p>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

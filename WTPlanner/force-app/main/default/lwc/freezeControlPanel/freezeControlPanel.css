@@ -1,0 +1,49 @@
+.session-type-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 0.25rem;
+    background: #fff;
+}
+
+.type-header {
+    cursor: default;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.expand-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.type-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.sessions-container {
+    background: #fafaf9;
+    border-top: 1px solid #f3f3f3;
+}
+
+.session-row {
+    border-bottom: 1px solid #f3f3f3;
+    padding-left: 0.5rem;
+}
+
+.session-row:last-child {
+    border-bottom: none;
+}
+
+.session-name {
+    font-size: 0.8125rem;
+}
+
+.bulk-actions {
+    padding-top: 0.5rem;
+    padding-bottom: 0.25rem;
+}
+
+.inherited-badge {
+    --slds-c-badge-color-background: #d8edff;
+    --slds-c-badge-text-color: #0176d3;
+}
