@@ -7,6 +7,7 @@ export interface ShiftData {
   sessionLocation: string;
   sessionType: string;
   hasOverlap: boolean;
+  isSessionFrozen?: boolean;
 }
 
 export function shiftListBlocks(
@@ -30,18 +31,19 @@ export function shiftListBlocks(
 
   for (const shift of shifts) {
     const overlap = shift.hasOverlap ? "  :warning: *OVERLAP*" : "";
+    const frozen = shift.isSessionFrozen ? "  :lock: _Frozen_" : "";
     const section: Record<string, unknown> = {
       type: "section",
       text: {
         type: "mrkdwn",
         text:
-          `*${shift.sessionName}*${overlap}\n${shift.startTime} - ${shift.endTime}  |  ${
+          `*${shift.sessionName}*${overlap}${frozen}\n${shift.startTime} - ${shift.endTime}  |  ${
             shift.sessionLocation ?? "TBD"
           }  |  _${shift.sessionType ?? ""}_`,
       },
     };
 
-    if (showDropButton) {
+    if (showDropButton && !shift.isSessionFrozen) {
       section.accessory = {
         type: "button",
         text: { type: "plain_text", text: "Drop" },
