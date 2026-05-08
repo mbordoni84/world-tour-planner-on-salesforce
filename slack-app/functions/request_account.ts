@@ -260,7 +260,7 @@ const requestAccount = SlackFunction(
 
         await client.chat.postMessage({
           channel: requesterId,
-          text: `:wave: You already have a staffing account!\n\n*Username:* ${existingUsername}\n*Login:* https://storm-973b1cdf0acdf3.my.salesforce.com/\n*Forgot password:* https://storm-973b1cdf0acdf3.my.salesforce.com/secur/forgotpassword.jsp?locale=us\n\nFor help, ask in <#${approvalChannel}>.`,
+          text: `:wave: You already have a staffing account!\n\n*Username:* ${existingUsername}\n*Login:* https://storm-973b1cdf0acdf3.my.salesforce.com/\n\nA password reset email has been sent to your inbox. Check your email (${email}) and follow the link to set your password.\n\nFor help, ask in <#${approvalChannel}>.`,
         });
       } else {
         const errMsg = rawData?.message || errCode || JSON.stringify(rawData) || "Unknown error";

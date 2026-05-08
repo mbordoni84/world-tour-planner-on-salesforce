@@ -25,6 +25,11 @@ global without sharing class StaffingAPI_CreateUser {
                 SELECT Id, Username FROM User WHERE Email = :email.trim() AND IsActive = true LIMIT 1
             ];
             if (!existing.isEmpty()) {
+                try {
+                    QuickUserCreateController.resetPasswordAsync(existing[0].Id);
+                } catch (Exception resetEx) {
+                    // Non-blocking
+                }
                 res.statusCode = 400;
                 res.responseBody = Blob.valueOf(JSON.serialize(
                     new Map<String, Object>{
