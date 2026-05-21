@@ -35,7 +35,7 @@ function buildBlocks(
   sessionTypeFilter: string,
   headerPrefix?: string,
 ): { blocks: Record<string, unknown>[]; text: string } {
-  const needingStaff = sessions.filter((s) => s.needsStaff);
+  const needingStaff = sessions.filter((s) => s.availableShifts > 0 && !s.isFrozen);
 
   const blocks: Record<string, unknown>[] = [];
 

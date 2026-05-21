@@ -78,6 +78,7 @@ export default class ShiftMarketplace extends LightningElement {
                     statusClass: this.getStatusClass(session),
                     statusKey: this.getStatusKey(session),
                     hasUnclaimed: session.availableShifts > 0,
+                    staffingLabel: this.buildStaffingLabel(session),
                     shifts: session.shifts.map(shift => ({
                         ...shift,
                         isMyShift: shift.assignedUserName && this.myShiftIds.has(shift.id),
@@ -151,10 +152,21 @@ export default class ShiftMarketplace extends LightningElement {
         this.applyFilters();
     }
 
+    buildStaffingLabel(session) {
+        const claimed = session.claimedShifts || 0;
+        const total = session.totalShifts || 0;
+        const min = session.minShifts || 1;
+        const max = session.maxShifts || total;
+        const minIcon = session.needsStaff ? '⚠️' : '✅';
+        const maxIcon = session.isFull ? ' 🔒' : '';
+        return `${claimed} / ${total} shifted — min. staff per fascia: ${min} ${minIcon}  |  max. per fascia: ${max}${maxIcon}`;
+    }
+
     getStatusClass(session) {
-        if (session.needsStaff && session.claimedShifts === 0) return 'session-card status-zero-staff';
-        if (session.needsStaff) return 'session-card status-needs-staff';
-        return 'session-card status-full';
+        const expanded = session.id === this.expandedSessionId ? ' is-expanded' : '';
+        if (session.needsStaff && session.claimedShifts === 0) return 'session-card status-zero-staff' + expanded;
+        if (session.needsStaff) return 'session-card status-needs-staff' + expanded;
+        return 'session-card status-full' + expanded;
     }
 
     getStatusKey(session) {

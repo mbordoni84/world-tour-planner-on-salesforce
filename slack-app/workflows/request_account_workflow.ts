@@ -3,7 +3,7 @@ import { RequestAccountDefinition } from "../functions/request_account.ts";
 
 const RequestAccountWorkflow = DefineWorkflow({
   callback_id: "request_account_workflow",
-  title: "Request Staffing Account",
+  title: "Request Account / Recover Credentials",
   input_parameters: {
     properties: {
       user_id: { type: Schema.slack.types.user_id },

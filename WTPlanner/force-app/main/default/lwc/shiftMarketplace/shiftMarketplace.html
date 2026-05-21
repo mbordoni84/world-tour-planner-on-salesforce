@@ -136,8 +136,14 @@
                                         </div>
                                         <div class="detail-row">
                                             <lightning-icon icon-name="utility:people" size="x-small"></lightning-icon>
-                                            <span>{session.claimedShifts} / {session.totalShifts} shifts filled — {session.staffingStatus}</span>
+                                            <span>{session.staffingLabel}</span>
                                         </div>
+                                        <template if:true={session.sessionOwner}>
+                                            <div class="detail-row">
+                                                <lightning-icon icon-name="utility:user" size="x-small"></lightning-icon>
+                                                <span>Owner: {session.sessionOwner}</span>
+                                            </div>
+                                        </template>
                                     </div>
 
                                     <!-- View Shifts button -->

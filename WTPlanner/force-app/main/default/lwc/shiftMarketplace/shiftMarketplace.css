@@ -20,17 +20,24 @@
 
 .session-card {
     border-radius: 0.5rem;
-    overflow: hidden;
+    overflow: visible;
+}
+
+article.slds-card {
+    overflow: visible;
+}
+
+.is-expanded {
+    position: relative;
+    z-index: 100;
 }
 
 .clickable-card {
     cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.clickable-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.sessions-grid > div:nth-child(even) article {
+    background-color: #f3f2f2;
 }
 
 .session-title {

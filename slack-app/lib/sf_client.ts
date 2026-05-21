@@ -34,7 +34,7 @@ export async function sfFetch(
     return {
       ok: false,
       status: 401,
-      data: { error: "Not authenticated with Salesforce" },
+      data: { error: "Not connected to Salesforce. Use a shortcut to connect — make sure to log in with your *World Tour org* account, not your main Salesforce org." },
     };
   }
 
@@ -58,7 +58,7 @@ export async function sfFetch(
       return {
         ok: false,
         status: 401,
-        data: { error: "Token refresh failed" },
+        data: { error: "Salesforce auth failed — you may have connected the wrong org. Please disconnect and reconnect, logging in with your *World Tour org* account." },
       };
     }
 

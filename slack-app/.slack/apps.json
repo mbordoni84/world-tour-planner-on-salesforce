@@ -11,6 +11,12 @@
       "enterprise_id": "E0AKHGA1ME2",
       "team_domain": "slack-demo-18131",
       "team_id": "E0AKHGA1ME2"
+    },
+    "E7T5PNK3P": {
+      "app_id": "A0B15F3SSET",
+      "enterprise_id": "E7T5PNK3P",
+      "team_domain": "salesforce",
+      "team_id": "E7T5PNK3P"
     }
   },
   "default": "slack-demo-18131"

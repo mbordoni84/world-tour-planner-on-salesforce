@@ -44,11 +44,38 @@
                 <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
             </template>
 
+            <!-- Owned Sessions -->
+            <template if:true={hasOwnedSessions}>
+                <div class="owned-sessions-section slds-m-bottom_large">
+                    <div class="owned-sessions-header">
+                        <lightning-icon icon-name="utility:key" size="x-small"></lightning-icon>
+                        <h3 class="slds-text-heading_small">You are the Owner of the following Sessions:</h3>
+                    </div>
+                    <div class="owned-sessions-list">
+                        <template for:each={ownedSessions} for:item="session">
+                            <div key={session.id} class="owned-session-row">
+                                <div class="owned-session-name">{session.name}</div>
+                                <div class="owned-session-meta">
+                                    <lightning-icon icon-name="utility:location" size="xx-small"></lightning-icon>
+                                    <span>{session.location}</span>
+                                </div>
+                                <div class="owned-session-meta">
+                                    <lightning-icon icon-name="utility:people" size="xx-small"></lightning-icon>
+                                    <span>{session.claimedShifts} / {session.totalShifts} shifts filled</span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <hr class="section-divider" />
+            </template>
+
             <!-- Timeline View -->
             <template if:true={hasShifts}>
+                <h3 class="slds-text-heading_small slds-m-bottom_small">These are the sessions you are staffing:</h3>
                 <div class="timeline-container">
                     <template for:each={myShifts} for:item="shift">
-                        <div key={shift.id} class={shift.hasOverlapClass}>
+                        <div key={shift.id} class={shift.rowClass}>
                             <article class="slds-card assignment-card">
                                 <div class="slds-card__header">
                                     <h3 class="slds-card__header-title">

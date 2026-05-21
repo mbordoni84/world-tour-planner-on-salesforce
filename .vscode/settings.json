@@ -3,5 +3,6 @@
     "workbench.colorCustomizations": {
         "statusBar.background": null,
         "activityBar.background": null
-    }
+    },
+    "java.jdt.ls.vmargs": "-noverify -Xmx1g -XX:+UseG1GC -Dfile.encoding=UTF-8"
 }

@@ -16,89 +16,90 @@
             </template>
 
             <template if:false={isLoading}>
-                <!-- KPI Tiles -->
-                <div class="slds-grid slds-gutters slds-m-bottom_medium kpi-row">
-                    <div class="slds-col slds-size_1-of-5">
+                <!-- KPI Tiles - Overall -->
+                <div class="slds-grid slds-gutters slds-m-bottom_small kpi-row">
+                    <div class="slds-col slds-size_1-of-7">
                         <div class="kpi-tile">
                             <div class="kpi-label">Total Shifts</div>
                             <div class="kpi-value">{totalShiftsDisplay}</div>
                         </div>
                     </div>
-                    <div class="slds-col slds-size_1-of-5">
+                    <div class="slds-col slds-size_1-of-7">
                         <div class="kpi-tile kpi-tile-success">
                             <div class="kpi-label">Assigned</div>
                             <div class="kpi-value kpi-success">{assignedDisplay}</div>
                         </div>
                     </div>
-                    <div class="slds-col slds-size_1-of-5">
+                    <div class="slds-col slds-size_1-of-7">
                         <div class="kpi-tile kpi-tile-danger">
                             <div class="kpi-label">Unassigned</div>
                             <div class="kpi-value kpi-danger">{unassignedDisplay}</div>
                         </div>
                     </div>
-                    <div class="slds-col slds-size_1-of-5">
+                    <div class="slds-col slds-size_1-of-7">
                         <div class="kpi-tile kpi-tile-warning clickable" onclick={handleOverlapTileClick}>
                             <div class="kpi-label">Overlaps</div>
                             <div class="kpi-value kpi-warning">{overlapsDisplay}</div>
                         </div>
                     </div>
-                    <div class="slds-col slds-size_1-of-5">
+                    <div class="slds-col slds-size_1-of-7">
                         <div class="kpi-tile">
                             <div class="kpi-label">Fill Rate</div>
                             <div class={fillRateClass}>{fillRateFormatted}</div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Filter Bar -->
-                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-grid_vertical-align-end">
-                    <div class="slds-col slds-size_1-of-3">
-                        <lightning-combobox
-                            name="sessionType"
-                            label="Session Type"
-                            value={selectedSessionType}
-                            options={sessionTypeOptions}
-                            onchange={handleSessionTypeChange}
-                        ></lightning-combobox>
+                    <div class="slds-col slds-size_1-of-7">
+                        <div class="kpi-tile kpi-tile-hours">
+                            <div class="kpi-label">Hours Staffed</div>
+                            <div class="kpi-value kpi-hours">{assignedHoursDisplay} <span class="kpi-of">/ {totalHoursDisplay}</span></div>
+                            <div class="hours-bar-track">
+                                <div class="hours-bar-fill" style={hoursBarWidth}></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_1-of-3">
-                        <lightning-combobox
-                            name="timeSlot"
-                            label="Time Slot"
-                            value={selectedTimeSlot}
-                            options={timeSlotOptions}
-                            onchange={handleTimeSlotChange}
-                        ></lightning-combobox>
-                    </div>
-                    <div class="slds-col slds-size_1-of-3">
-                        <lightning-combobox
-                            name="status"
-                            label="Status"
-                            value={selectedStatus}
-                            options={statusOptions}
-                            onchange={handleStatusChange}
-                        ></lightning-combobox>
+                    <div class="slds-col slds-size_1-of-7">
+                        <div class="kpi-tile kpi-tile-people">
+                            <div class="kpi-label">Unique Staff</div>
+                            <div class="kpi-value kpi-people">{uniqueStaffedDisplay}</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Session Staffing Table -->
-                <template if:true={hasSessions}>
-                    <lightning-datatable
-                        key-field="id"
-                        data={filteredSessions}
-                        columns={sessionColumns}
-                        sorted-by={sortedBy}
-                        sorted-direction={sortDirection}
-                        onsort={handleSort}
-                        hide-checkbox-column
-                    ></lightning-datatable>
-                </template>
-
-                <template if:false={hasSessions}>
-                    <div class="slds-text-align_center slds-p-vertical_large">
-                        <p class="slds-text-body_regular slds-text-color_weak">
-                            No sessions match the current filters.
-                        </p>
+                <!-- KPI per Session Type -->
+                <template if:true={hasSessionTypeKpis}>
+                    <div class="session-type-kpi-section slds-m-bottom_medium">
+                        <h3 class="section-label slds-m-bottom_x-small">By Session Type</h3>
+                        <div class="slds-grid slds-gutters slds-wrap kpi-row">
+                            <template for:each={sessionTypeKpis} for:item="typeKpi">
+                                <div key={typeKpi.name} class="slds-col slds-size_1-of-3 slds-m-bottom_small">
+                                    <div class="kpi-tile-type">
+                                        <div class="kpi-type-name-row">
+                                            <span class="kpi-type-name">{typeKpi.name}</span>
+                                            <template if:true={typeKpi.allMinReached}>
+                                                <lightning-icon icon-name="utility:check" size="x-small" variant="success" title="Staffing minimo raggiunto per tutte le sessioni"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <div class="kpi-type-grid">
+                                            <div class="kpi-type-metric">
+                                                <div class="kpi-label">Fill Rate</div>
+                                                <div class={typeKpi.fillRateClass}>{typeKpi.fillRateFormatted}</div>
+                                            </div>
+                                            <div class="kpi-type-metric">
+                                                <div class="kpi-label">Hours Staffed</div>
+                                                <div class="kpi-value-sm kpi-success">{typeKpi.assignedHours}h</div>
+                                            </div>
+                                            <div class="kpi-type-metric">
+                                                <div class="kpi-label">Hours Remaining</div>
+                                                <div class="kpi-value-sm kpi-danger">{typeKpi.remainingHours}h</div>
+                                            </div>
+                                        </div>
+                                        <div class="hours-bar-track slds-m-top_xx-small">
+                                            <div class="hours-bar-fill" style={typeKpi.fillRateBarWidth}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </template>
 
@@ -110,7 +111,7 @@
                             Top Contributors
                         </h3>
                         <div class="leaderboard-list">
-                            <template for:each={leaderboard} for:item="entry">
+                            <template for:each={topLeaderboard} for:item="entry">
                                 <div key={entry.userName} class="leaderboard-row">
                                     <div class="leaderboard-rank">
                                         <template if:true={entry.isTopThree}>
@@ -122,12 +123,39 @@
                                     </div>
                                     <div class="leaderboard-name">{entry.userName}</div>
                                     <div class="leaderboard-count">
-                                        <lightning-badge label={entry.shiftCount}></lightning-badge>
-                                        <span class="slds-text-body_small slds-text-color_weak slds-m-left_xx-small">shifts</span>
+                                        <lightning-badge label={entry.hoursDisplay}></lightning-badge>
+                                        <span class="slds-text-body_small slds-text-color_weak slds-m-left_xx-small">hrs</span>
                                     </div>
                                 </div>
                             </template>
+
+                            <template if:true={leaderboardExpanded}>
+                                <template for:each={remainingLeaderboard} for:item="entry">
+                                    <div key={entry.userName} class="leaderboard-row">
+                                        <div class="leaderboard-rank">
+                                            <span class="rank-badge">{entry.medal}</span>
+                                        </div>
+                                        <div class="leaderboard-name">{entry.userName}</div>
+                                        <div class="leaderboard-count">
+                                            <lightning-badge label={entry.hoursDisplay}></lightning-badge>
+                                            <span class="slds-text-body_small slds-text-color_weak slds-m-left_xx-small">hrs</span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
                         </div>
+
+                        <template if:true={hasMoreLeaderboard}>
+                            <div class="slds-m-top_x-small slds-text-align_center">
+                                <lightning-button
+                                    label={leaderboardToggleLabel}
+                                    icon-name={leaderboardToggleIcon}
+                                    icon-position="right"
+                                    variant="base"
+                                    onclick={toggleLeaderboard}
+                                ></lightning-button>
+                            </div>
+                        </template>
                     </div>
                 </template>
 
@@ -162,6 +190,68 @@
                         </template>
                     </template>
                 </div>
+
+                <!-- Filter Bar -->
+                <div class="slds-grid slds-gutters slds-m-top_large slds-m-bottom_medium slds-grid_vertical-align-end">
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            name="sessionType"
+                            label="Session Type"
+                            value={selectedSessionType}
+                            options={sessionTypeOptions}
+                            onchange={handleSessionTypeChange}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            name="startsAfter"
+                            label="Starts After"
+                            value={selectedStartsAfter}
+                            options={timeOptions}
+                            onchange={handleStartsAfterChange}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            name="endsBefore"
+                            label="Ends Before"
+                            value={selectedEndsBefore}
+                            options={timeOptions}
+                            onchange={handleEndsBeforeChange}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            name="status"
+                            label="Status"
+                            value={selectedStatus}
+                            options={statusOptions}
+                            onchange={handleStatusChange}
+                        ></lightning-combobox>
+                    </div>
+                </div>
+
+                <!-- Session Staffing Table -->
+                <template if:true={hasSessions}>
+                    <lightning-datatable
+                        key-field="id"
+                        data={filteredSessions}
+                        columns={sessionColumns}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortDirection}
+                        onsort={handleSort}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                </template>
+
+                <template if:false={hasSessions}>
+                    <div class="slds-text-align_center slds-p-vertical_large">
+                        <p class="slds-text-body_regular slds-text-color_weak">
+                            No sessions match the current filters.
+                        </p>
+                    </div>
+                </template>
+
             </template>
         </div>
     </lightning-card>

@@ -8,6 +8,7 @@ public with sharing class ShiftMarketplaceController {
                        Min_Shifts__c, Max_Shifts__c,
                        Is_Frozen__c, Session_Type__r.Is_Frozen__c,
                        Session_Type__r.Name,
+                       session_owner__c, session_owner__r.Name,
                        (SELECT Id, Name, Start_Time__c, End_Time__c,
                                User__c, User__r.Name, Has_Overlap__c
                         FROM Shifts__r
@@ -250,12 +251,12 @@ public with sharing class ShiftMarketplaceController {
 
             List<UserOption> options = new List<UserOption>();
             for (User u : [
-                SELECT Id, LastName
+                SELECT Id, Name
                 FROM User
                 WHERE Id IN :userIds AND IsActive = true
-                ORDER BY LastName
+                ORDER BY Name
             ]) {
-                options.add(new UserOption(u.Id, u.LastName));
+                options.add(new UserOption(u.Id, u.Name));
             }
             return options;
         } catch (Exception e) {
@@ -380,6 +381,38 @@ public with sharing class ShiftMarketplaceController {
                String.valueOf(t.minute()).leftPad(2, '0');
     }
 
+    @AuraEnabled(cacheable=false)
+    public static List<SessionWrapper> getOwnedSessions() {
+        return getOwnedSessionsForUser(UserInfo.getUserId());
+    }
+
+    @AuraEnabled(cacheable=false)
+    public static List<SessionWrapper> getOwnedSessionsForUser(String userId) {
+        try {
+            List<Session__c> sessions = [
+                SELECT Id, Name, Location__c, Description__c,
+                       Min_Shifts__c, Max_Shifts__c,
+                       Is_Frozen__c, Session_Type__r.Is_Frozen__c,
+                       Session_Type__r.Name,
+                       session_owner__c, session_owner__r.Name,
+                       (SELECT Id, Name, Start_Time__c, End_Time__c,
+                               User__c, User__r.Name, Has_Overlap__c
+                        FROM Shifts__r
+                        ORDER BY Start_Time__c)
+                FROM Session__c
+                WHERE session_owner__c = :userId
+                ORDER BY Name
+            ];
+            List<SessionWrapper> wrappers = new List<SessionWrapper>();
+            for (Session__c session : sessions) {
+                wrappers.add(new SessionWrapper(session));
+            }
+            return wrappers;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error fetching owned sessions: ' + e.getMessage());
+        }
+    }
+
     private static Boolean isTimeOverlap(Time start1, Time end1, Time start2, Time end2) {
         Long start1Ms = start1.hour() * 3600000 + start1.minute() * 60000;
         Long end1Ms = end1.hour() * 3600000 + end1.minute() * 60000;
@@ -405,6 +438,7 @@ public with sharing class ShiftMarketplaceController {
         @AuraEnabled public Boolean canAddShift {get; set;}
         @AuraEnabled public Boolean isFrozen {get; set;}
         @AuraEnabled public String staffingStatus {get; set;}
+        @AuraEnabled public String sessionOwner {get; set;}
         @AuraEnabled public List<ShiftDetail> shifts {get; set;}
 
         public SessionWrapper(Session__c session) {
@@ -413,6 +447,7 @@ public with sharing class ShiftMarketplaceController {
             this.location = session.Location__c;
             this.description = session.Description__c;
             this.sessionType = session.Session_Type__r.Name;
+            this.sessionOwner = session.session_owner__r != null ? session.session_owner__r.Name : null;
             this.isFrozen = session.Is_Frozen__c ||
                 (session.Session_Type__r != null && session.Session_Type__r.Is_Frozen__c);
             this.minShifts = session.Min_Shifts__c != null ? (Integer)session.Min_Shifts__c : 1;
@@ -456,16 +491,17 @@ public with sharing class ShiftMarketplaceController {
                 }
             }
 
+            Boolean allShiftsClaimed = (totalClaimed == this.totalShifts && this.totalShifts > 0);
             this.needsStaff = anySlotNeedsStaff;
-            this.isFull = allSlotsMinReached;
+            this.isFull = allShiftsClaimed;
             this.canAddShift = !allSlotsMaxReached;
 
             if (anySlotNeedsStaff) {
                 this.staffingStatus = 'Needs Staff (' + worstClaimed + '/' + this.minShifts + ' min per slot)';
-            } else if (allSlotsMaxReached) {
-                this.staffingStatus = 'Fully Staffed (max)';
+            } else if (allShiftsClaimed) {
+                this.staffingStatus = 'Fully Staffed';
             } else {
-                this.staffingStatus = 'Fully Staffed (' + this.minShifts + '/' + this.minShifts + ' min per slot)';
+                this.staffingStatus = 'Min Reached (' + totalClaimed + '/' + this.totalShifts + ' shifts)';
             }
         }
     }

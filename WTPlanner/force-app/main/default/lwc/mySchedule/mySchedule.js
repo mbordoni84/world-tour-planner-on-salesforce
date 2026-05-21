@@ -3,6 +3,8 @@ import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
 import getMyShifts from '@salesforce/apex/ShiftMarketplaceController.getMyShifts';
+import getOwnedSessions from '@salesforce/apex/ShiftMarketplaceController.getOwnedSessions';
+import getOwnedSessionsForUser from '@salesforce/apex/ShiftMarketplaceController.getOwnedSessionsForUser';
 import getShiftsForUser from '@salesforce/apex/ShiftMarketplaceController.getShiftsForUser';
 import dropShift from '@salesforce/apex/ShiftMarketplaceController.dropShift';
 import isCurrentUserAdmin from '@salesforce/apex/ShiftMarketplaceController.isCurrentUserAdmin';
@@ -10,6 +12,7 @@ import getEligibleUsers from '@salesforce/apex/ShiftMarketplaceController.getEli
 
 export default class MySchedule extends NavigationMixin(LightningElement) {
     @track myShifts = [];
+    @track ownedSessions = [];
     @track isLoading = false;
     @track isAdmin = false;
     @track selectedUserId = '';
@@ -38,18 +41,24 @@ export default class MySchedule extends NavigationMixin(LightningElement) {
         this.wiredMyShiftsResult = result;
         if (!this.selectedUserId && result.data) {
             this.myShifts = this.mapShifts(result.data);
+            getOwnedSessions().then(data => { this.ownedSessions = data; }).catch(() => {});
         } else if (result.error) {
             this.showToast('Error', 'Error loading your schedule', 'error');
         }
     }
 
     mapShifts(data) {
-        return data.map(shift => ({
-            ...shift,
-            hasOverlapClass: shift.hasOverlap ? 'has-overlap' : '',
-            shiftTime: `${shift.startTime} - ${shift.endTime}`,
-            isFrozen: shift.isSessionFrozen
-        }));
+        return data.map((shift, index) => {
+            const base = index % 2 === 1 ? 'shift-row-alt' : '';
+            const overlap = shift.hasOverlap ? 'has-overlap' : '';
+            return {
+                ...shift,
+                hasOverlapClass: overlap,
+                rowClass: [base, overlap].filter(Boolean).join(' '),
+                shiftTime: `${shift.startTime} - ${shift.endTime}`,
+                isFrozen: shift.isSessionFrozen
+            };
+        });
     }
 
     async handleUserChange(event) {
@@ -58,12 +67,17 @@ export default class MySchedule extends NavigationMixin(LightningElement) {
             this.myShifts = this.wiredMyShiftsResult?.data
                 ? this.mapShifts(this.wiredMyShiftsResult.data)
                 : [];
+            this.ownedSessions = await getOwnedSessions().catch(() => []);
             return;
         }
         this.isLoading = true;
         try {
-            const data = await getShiftsForUser({ userId: this.selectedUserId });
-            this.myShifts = this.mapShifts(data);
+            const [shifts, owned] = await Promise.all([
+                getShiftsForUser({ userId: this.selectedUserId }),
+                getOwnedSessionsForUser({ userId: this.selectedUserId })
+            ]);
+            this.myShifts = this.mapShifts(shifts);
+            this.ownedSessions = owned;
         } catch (error) {
             this.showToast('Error', error.body?.message || 'Error loading schedule', 'error');
         } finally {
@@ -143,5 +157,9 @@ export default class MySchedule extends NavigationMixin(LightningElement) {
 
     get isViewingOtherUser() {
         return !!this.selectedUserId;
+    }
+
+    get hasOwnedSessions() {
+        return this.ownedSessions.length > 0;
     }
 }

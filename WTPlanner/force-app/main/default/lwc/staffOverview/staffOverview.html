@@ -1,0 +1,153 @@
+<template>
+    <lightning-card title="Staff Overview" icon-name="standard:people">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+                variant="neutral"
+            ></lightning-button>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <template if:false={isAdmin}>
+                <div class="slds-text-align_center slds-p-vertical_large">
+                    <lightning-icon icon-name="utility:lock" size="large" variant="error"></lightning-icon>
+                    <p class="slds-m-top_small slds-text-heading_small">Access restricted to administrators.</p>
+                </div>
+            </template>
+
+            <template if:true={isAdmin}>
+                <template if:true={isLoading}>
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </template>
+
+                <template if:true={hasData}>
+                    <!-- KPI Row -->
+                    <div class="slds-grid slds-gutters slds-m-bottom_large kpi-row">
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="kpi-tile kpi-tile-people">
+                                <div class="kpi-label">Persone Staffate</div>
+                                <div class="kpi-value kpi-people">{totalStaffed}</div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="kpi-tile kpi-tile-hours">
+                                <div class="kpi-label">Media Ore / Persona</div>
+                                <div class="kpi-value kpi-hours">{avgHours}h</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Box: All Staff -->
+                    <div class="email-box slds-m-bottom_medium">
+                        <div class="email-box-header">
+                            <lightning-icon icon-name="utility:email" size="x-small"></lightning-icon>
+                            <span class="slds-m-left_x-small slds-text-title_caps">All Staff Emails</span>
+                            <span class="email-count slds-m-left_small">({totalStaffed} persone)</span>
+                        </div>
+                        <div class="email-box-body">
+                            <textarea class="email-textarea" readonly onclick={handleTextareaClick} data-key="all">{emailList}</textarea>
+                            <lightning-button label={copyAllLabel} icon-name="utility:copy" variant="brand" data-key="all" onclick={handleCopy} class="copy-btn"></lightning-button>
+                        </div>
+                    </div>
+
+                    <!-- Email Box: Owners Only -->
+                    <div class="email-box slds-m-bottom_large">
+                        <div class="email-box-header">
+                            <lightning-icon icon-name="utility:key" size="x-small"></lightning-icon>
+                            <span class="slds-m-left_x-small slds-text-title_caps">Session Owners Emails</span>
+                        </div>
+                        <div class="email-box-body">
+                            <textarea class="email-textarea" readonly onclick={handleTextareaClick} data-key="owners">{ownerEmailList}</textarea>
+                            <lightning-button label={copyOwnersLabel} icon-name="utility:copy" variant="neutral" data-key="owners" onclick={handleCopy} class="copy-btn"></lightning-button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-4">
+                            <lightning-input
+                                type="number"
+                                label="Max ore"
+                                value={maxHoursFilter}
+                                min="0"
+                                step="0.5"
+                                onchange={handleHoursChange}
+                                variant="label-stacked"
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <lightning-input
+                                type="number"
+                                label="Max shift"
+                                value={maxShiftsFilter}
+                                min="0"
+                                step="1"
+                                onchange={handleShiftsChange}
+                                variant="label-stacked"
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <lightning-combobox
+                                label="Ruolo Owner"
+                                value={ownerFilter}
+                                options={ownerFilterOptions}
+                                onchange={handleOwnerFilterChange}
+                                variant="label-stacked"
+                            ></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4 filter-reset-col">
+                            <lightning-button
+                                label="Reset filtri"
+                                icon-name="utility:undo"
+                                variant="neutral"
+                                onclick={handleResetFilters}
+                            ></lightning-button>
+                        </div>
+                    </div>
+
+                    <!-- Staff Table -->
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col" onclick={handleSort} data-field="name" class="sortable-col">
+                                    <div class="col-header"><span>Nome</span><span class="sort-icon">{sortIconName}</span></div>
+                                </th>
+                                <th scope="col"><div class="slds-truncate">Email</div></th>
+                                <th scope="col" onclick={handleSort} data-field="totalHours" class="sortable-col">
+                                    <div class="col-header"><span>Ore</span><span class="sort-icon">{sortIconHours}</span></div>
+                                </th>
+                                <th scope="col" onclick={handleSort} data-field="shiftCount" class="sortable-col">
+                                    <div class="col-header"><span>Shift</span><span class="sort-icon">{sortIconShifts}</span></div>
+                                </th>
+                                <th scope="col" onclick={handleSort} data-field="ownerSessionCount" class="sortable-col">
+                                    <div class="col-header"><span>Sessioni Owner</span><span class="sort-icon">{sortIconOwner}</span></div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={filteredMembers} for:item="m">
+                                <tr key={m.email} class={m.rowClass}>
+                                    <td>
+                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                            <span>{m.name}</span>
+                                            <template if:true={m.isUnderFourHours}>
+                                                <lightning-badge label="⚠ Under 4h" class="slds-m-left_x-small warning-badge"></lightning-badge>
+                                            </template>
+                                        </div>
+                                    </td>
+                                    <td><div class="slds-truncate email-cell">{m.email}</div></td>
+                                    <td><strong>{m.totalHours}h</strong></td>
+                                    <td>{m.shiftCount}</td>
+                                    <td>{m.ownerSessionCount}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <p class="slds-m-top_x-small slds-text-color_weak slds-text-body_small">{filteredCount} di {totalStaffed} persone</p>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

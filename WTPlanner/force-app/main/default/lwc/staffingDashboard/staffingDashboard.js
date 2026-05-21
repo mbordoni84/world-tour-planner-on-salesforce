@@ -13,6 +13,13 @@ const SESSION_COLUMNS = [
         fieldName: 'status',
         sortable: true,
         cellAttributes: { class: { fieldName: 'statusCellClass' } }
+    },
+    {
+        label: 'Min OK',
+        fieldName: 'minBadge',
+        type: 'text',
+        fixedWidth: 80,
+        cellAttributes: { alignment: 'center' }
     }
 ];
 
@@ -30,22 +37,37 @@ export default class StaffingDashboard extends LightningElement {
     @track filteredSessions = [];
     @track overlaps = [];
     @track leaderboard = [];
+    @track sessionTypeKpis = [];
     @track isLoading = true;
     @track overlapExpanded = true;
+    @track leaderboardExpanded = false;
 
     // Filters
     @track selectedSessionType = '';
-    @track selectedTimeSlot = '';
+    @track selectedStartsAfter = '';
+    @track selectedEndsBefore = '';
     @track selectedStatus = '';
 
     // Filter options (populated from data)
     sessionTypeOptions = [{ label: 'All Types', value: '' }];
-    timeSlotOptions = [{ label: 'All Time Slots', value: '' }];
     statusOptions = [
         { label: 'All Statuses', value: '' },
         { label: 'Needs Staff', value: 'Needs Staff' },
         { label: 'Min Reached', value: 'Min Reached' },
         { label: 'Fully Staffed', value: 'Fully Staffed' }
+    ];
+
+    timeOptions = [
+        { label: 'Any time', value: '' },
+        { label: '00:00', value: '0' },
+        { label: '06:00', value: '360' },
+        { label: '08:00', value: '480' },
+        { label: '10:00', value: '600' },
+        { label: '12:00', value: '720' },
+        { label: '14:00', value: '840' },
+        { label: '16:00', value: '960' },
+        { label: '18:00', value: '1080' },
+        { label: '22:00', value: '1320' }
     ];
 
     // Sorting
@@ -66,25 +88,29 @@ export default class StaffingDashboard extends LightningElement {
             this.overlaps = result.data.overlaps || [];
             this.leaderboard = (result.data.leaderboard || []).map(e => ({
                 ...e,
+                hoursDisplay: (e.totalHours != null ? e.totalHours : 0) + 'h',
                 medal: e.rank === 1 ? '1st' : e.rank === 2 ? '2nd' : e.rank === 3 ? '3rd' : String(e.rank),
                 isTopThree: e.rank <= 3
+            }));
+
+            this.sessionTypeKpis = (result.data.sessionTypeKpis || []).map(k => ({
+                ...k,
+                fillRateFormatted: k.fillRate + '%',
+                fillRateBarWidth: 'width: ' + Math.min(k.fillRate, 100) + '%',
+                fillRateClass: k.fillRate >= 80 ? 'kpi-value-sm kpi-success' : k.fillRate >= 50 ? 'kpi-value-sm kpi-warning' : 'kpi-value-sm kpi-danger'
             }));
 
             this.allSessions = (result.data.sessions || []).map(s => ({
                 ...s,
                 staffingLabel: s.claimed + ' / ' + s.minShifts + ' min (' + s.maxShifts + ' max)',
-                statusCellClass: this.getStatusCellClass(s.status)
+                statusCellClass: this.getStatusCellClass(s.status),
+                minBadge: s.isMinReached ? '✅' : '⚠️'
             }));
 
             // Build filter options from data
             this.sessionTypeOptions = [{ label: 'All Types', value: '' }];
             (result.data.sessionTypes || []).forEach(t => {
                 this.sessionTypeOptions.push({ label: t, value: t });
-            });
-
-            this.timeSlotOptions = [{ label: 'All Time Slots', value: '' }];
-            (result.data.timeSlots || []).forEach(t => {
-                this.timeSlotOptions.push({ label: t, value: t });
             });
 
             this.applyFilters();
@@ -106,8 +132,13 @@ export default class StaffingDashboard extends LightningElement {
         this.applyFilters();
     }
 
-    handleTimeSlotChange(event) {
-        this.selectedTimeSlot = event.detail.value;
+    handleStartsAfterChange(event) {
+        this.selectedStartsAfter = event.detail.value;
+        this.applyFilters();
+    }
+
+    handleEndsBeforeChange(event) {
+        this.selectedEndsBefore = event.detail.value;
         this.applyFilters();
     }
 
@@ -117,11 +148,15 @@ export default class StaffingDashboard extends LightningElement {
     }
 
     applyFilters() {
+        const startsAfterMins = this.selectedStartsAfter ? parseInt(this.selectedStartsAfter, 10) : null;
+        const endsBeforeMins = this.selectedEndsBefore ? parseInt(this.selectedEndsBefore, 10) : null;
+
         this.filteredSessions = this.allSessions.filter(s => {
             const matchesType = !this.selectedSessionType || s.sessionType === this.selectedSessionType;
-            const matchesSlot = !this.selectedTimeSlot || s.timeRange === this.selectedTimeSlot;
             const matchesStatus = !this.selectedStatus || s.status === this.selectedStatus;
-            return matchesType && matchesSlot && matchesStatus;
+            const matchesStart = startsAfterMins === null || s.earliestStartMins >= startsAfterMins;
+            const matchesEnd = endsBeforeMins === null || s.latestEndMins <= endsBeforeMins;
+            return matchesType && matchesStatus && matchesStart && matchesEnd;
         });
         this.sortData(this.sortedBy, this.sortDirection);
     }
@@ -158,6 +193,11 @@ export default class StaffingDashboard extends LightningElement {
     // Toggle overlap section
     toggleOverlaps() {
         this.overlapExpanded = !this.overlapExpanded;
+    }
+
+    // Toggle leaderboard extra rows
+    toggleLeaderboard() {
+        this.leaderboardExpanded = !this.leaderboardExpanded;
     }
 
     // KPI tile click → scroll to overlaps
@@ -214,7 +254,57 @@ export default class StaffingDashboard extends LightningElement {
         return this.summary.overlaps || 0;
     }
 
+    get uniqueStaffedDisplay() {
+        return this.summary.uniqueStaffed || 0;
+    }
+
     get hasLeaderboard() {
         return this.leaderboard.length > 0;
+    }
+
+    get topLeaderboard() {
+        return this.leaderboard.slice(0, 10);
+    }
+
+    get remainingLeaderboard() {
+        return this.leaderboard.slice(10);
+    }
+
+    get hasMoreLeaderboard() {
+        return this.leaderboard.length > 10;
+    }
+
+    get leaderboardToggleLabel() {
+        const count = this.leaderboard.length - 10;
+        return this.leaderboardExpanded ? 'Show less' : `Show ${count} more`;
+    }
+
+    get leaderboardToggleIcon() {
+        return this.leaderboardExpanded ? 'utility:chevronup' : 'utility:chevrondown';
+    }
+
+    get hasSessionTypeKpis() {
+        return this.sessionTypeKpis.length > 0;
+    }
+
+    get totalHoursDisplay() {
+        return this.summary.totalHours != null ? this.summary.totalHours + 'h' : '0h';
+    }
+
+    get assignedHoursDisplay() {
+        return this.summary.assignedHours != null ? this.summary.assignedHours + 'h' : '0h';
+    }
+
+    get remainingHours() {
+        const total = this.summary.totalHours || 0;
+        const assigned = this.summary.assignedHours || 0;
+        return (total - assigned).toFixed(1);
+    }
+
+    get hoursBarWidth() {
+        const total = this.summary.totalHours || 0;
+        const assigned = this.summary.assignedHours || 0;
+        if (total === 0) return 'width: 0%';
+        return 'width: ' + Math.min((assigned / total) * 100, 100).toFixed(1) + '%';
     }
 }

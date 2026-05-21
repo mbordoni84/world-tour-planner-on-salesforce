@@ -7,6 +7,8 @@ import RenderHomeWorkflow from "./workflows/render_home_workflow.ts";
 import NotifyShiftChangeWorkflow from "./workflows/notify_shift_change_workflow.ts";
 import DailyDigestWorkflow from "./workflows/daily_digest_workflow.ts";
 import RequestAccountWorkflow from "./workflows/request_account_workflow.ts";
+import DisconnectWorkflow from "./workflows/disconnect_workflow.ts";
+import ConnectWorkflow from "./workflows/connect_workflow.ts";
 
 export default Manifest({
   name: "World Tour Staffing",
@@ -21,6 +23,8 @@ export default Manifest({
     NotifyShiftChangeWorkflow,
     DailyDigestWorkflow,
     RequestAccountWorkflow,
+    DisconnectWorkflow,
+    ConnectWorkflow,
   ],
   outgoingDomains: [
     "login.salesforce.com",

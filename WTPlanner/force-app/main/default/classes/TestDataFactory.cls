@@ -17,6 +17,10 @@ public class TestDataFactory {
 
     @TestVisible
     private static Event__c createEvent() {
+        List<Event__c> existing = [SELECT Id FROM Event__c WHERE Name = 'World Tour Milan 2026' LIMIT 1];
+        if (!existing.isEmpty()) {
+            return existing[0];
+        }
         Event__c event = new Event__c(
             Name = 'World Tour Milan 2026'
         );
@@ -56,19 +60,36 @@ public class TestDataFactory {
     @TestVisible
     private static List<Session_Type__c> createSessionTypes(Id eventId) {
         List<String> typeNames = new List<String>{
-            'Booth', 'Theatre', 'Keynote', 'Consultation', 'SIC Area', 'Breakout'
+            'Booth', 'Theatre', 'Keynote', 'Consultation', 'SIC', 'Breakout'
         };
+
+        Map<String, Session_Type__c> existingByName = new Map<String, Session_Type__c>();
+        for (Session_Type__c st : [SELECT Id, Name FROM Session_Type__c WHERE Name IN :typeNames]) {
+            existingByName.put(st.Name, st);
+        }
+
+        List<Session_Type__c> toInsert = new List<Session_Type__c>();
+        for (String typeName : typeNames) {
+            if (!existingByName.containsKey(typeName)) {
+                toInsert.add(new Session_Type__c(
+                    Name = typeName,
+                    Event__c = eventId,
+                    Description__c = typeName + ' type sessions'
+                ));
+            }
+        }
+
+        if (!toInsert.isEmpty()) {
+            insert toInsert;
+            for (Session_Type__c st : toInsert) {
+                existingByName.put(st.Name, st);
+            }
+        }
 
         List<Session_Type__c> sessionTypes = new List<Session_Type__c>();
         for (String typeName : typeNames) {
-            sessionTypes.add(new Session_Type__c(
-                Name = typeName,
-                Event__c = eventId,
-                Description__c = typeName + ' type sessions'
-            ));
+            sessionTypes.add(existingByName.get(typeName));
         }
-
-        insert sessionTypes;
         return sessionTypes;
     }
 
@@ -151,7 +172,7 @@ public class TestDataFactory {
             when 'Theatre' { return 'Main Theatre'; }
             when 'Keynote' { return 'Grand Ballroom'; }
             when 'Consultation' { return 'Meeting Room 2A'; }
-            when 'SIC Area' { return 'Success Innovation Center'; }
+            when 'SIC' { return 'Success Innovation Center'; }
             when 'Breakout' { return 'Breakout Room B'; }
             when else { return 'TBD'; }
         }

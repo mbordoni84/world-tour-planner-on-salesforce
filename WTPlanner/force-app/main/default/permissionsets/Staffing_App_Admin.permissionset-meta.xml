@@ -65,6 +65,10 @@
         <tab>Freeze_Control</tab>
         <visibility>Visible</visibility>
     </tabSettings>
+    <tabSettings>
+        <tab>Staff_Overview</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 
     <!-- Session_Type__c permissions -->
     <fieldPermissions>

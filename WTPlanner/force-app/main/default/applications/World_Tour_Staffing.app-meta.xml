@@ -22,6 +22,7 @@
     <tabs>Overlap_Dashboard</tabs>
     <tabs>Master_Roster</tabs>
     <tabs>Freeze_Control</tabs>
+    <tabs>Staff_Overview</tabs>
     <profileActionOverrides>
         <actionName>Tab</actionName>
         <content>Staffing_Home_Page</content>

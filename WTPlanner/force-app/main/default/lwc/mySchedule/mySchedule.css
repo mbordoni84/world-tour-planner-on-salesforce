@@ -66,6 +66,66 @@
     --slds-c-badge-text-color: #0176d3;
 }
 
+/* Owned sessions section */
+.owned-sessions-section {
+    background-color: #f0f7ff;
+    border: 1px solid #c9e0f5;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.owned-sessions-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #c9e0f5;
+    color: #0176d3;
+}
+
+.owned-sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.owned-session-row {
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.owned-session-row:nth-child(even) {
+    background-color: #daeeff;
+}
+
+.owned-session-name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: #0176d3;
+    margin-bottom: 0.25rem;
+}
+
+.owned-session-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: #444;
+    margin-top: 0.2rem;
+}
+
+.section-divider {
+    border: none;
+    border-top: 2px solid #e0e0e0;
+    margin: 0 0 1.25rem 0;
+}
+
+/* Alternating shift rows */
+.shift-row-alt .assignment-card {
+    background-color: #f3f2f2;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
     .assignment-card {

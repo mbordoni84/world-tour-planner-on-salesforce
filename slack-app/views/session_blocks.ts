@@ -13,6 +13,7 @@ export interface SessionData {
   sessionType: string;
   staffingStatus: string;
   needsStaff: boolean;
+  isFrozen: boolean;
   claimedShifts: number;
   totalShifts: number;
   availableShifts: number;
@@ -34,7 +35,7 @@ export function sessionListBlocks(
   page = 0,
   sessionTypeFilter = "all",
 ): Record<string, unknown>[] {
-  const needingStaff = sessions.filter((s) => s.needsStaff);
+  const needingStaff = sessions.filter((s) => s.availableShifts > 0 && !s.isFrozen);
 
   if (needingStaff.length === 0) {
     return [
