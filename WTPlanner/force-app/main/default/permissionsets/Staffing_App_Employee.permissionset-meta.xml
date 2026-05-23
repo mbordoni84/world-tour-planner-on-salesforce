@@ -113,6 +113,10 @@
         <apexClass>StaffingAPI_Digest</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>StaffingAPI_OwnedSessions</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
 
     <!-- Session_Type__c permissions (Read Only) -->
     <fieldPermissions>

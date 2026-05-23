@@ -2,6 +2,17 @@ import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import { sfFetch } from "../lib/sf_client.ts";
 import { type ShiftData, shiftListBlocks } from "../views/shift_blocks.ts";
 
+interface OwnedSessionData {
+  id: string;
+  name: string;
+  location: string;
+  sessionType: string;
+  totalShifts: number;
+  claimedShifts: number;
+  staffingStatus: string;
+  isFrozen: boolean;
+}
+
 export const GetMyShiftsDefinition = DefineFunction({
   callback_id: "get_my_shifts",
   title: "Get My Shifts",
@@ -23,6 +34,43 @@ export const GetMyShiftsDefinition = DefineFunction({
   },
 });
 
+function ownedSessionBlocks(
+  sessions: OwnedSessionData[],
+): Record<string, unknown>[] {
+  if (sessions.length === 0) return [];
+
+  const blocks: Record<string, unknown>[] = [];
+
+  blocks.push({
+    type: "header",
+    text: { type: "plain_text", text: `You are owner of the following sessions (${sessions.length})` },
+  });
+  blocks.push({
+    type: "context",
+    elements: [
+      { type: "mrkdwn", text: ":key: Contatta proattivamente lo staff della tua sessione e assicurati che tutti siano sul pezzo, è compito tuo!" },
+    ],
+  });
+  blocks.push({ type: "divider" });
+
+  for (const session of sessions) {
+    const frozen = session.isFrozen ? "  :lock: _Frozen_" : "";
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text:
+          `*${session.name}*${frozen}\n${session.claimedShifts}/${session.totalShifts} shifts filled  |  ${
+            session.location ?? "TBD"
+          }  |  _${session.sessionType ?? ""}_\n_${session.staffingStatus}_`,
+      },
+    });
+    blocks.push({ type: "divider" });
+  }
+
+  return blocks;
+}
+
 async function postShiftList(
   client: Parameters<Parameters<typeof SlackFunction>[1]>[0]["client"],
   tokenId: string,
@@ -30,18 +78,24 @@ async function postShiftList(
   channelId: string,
   headerPrefix?: string,
 ) {
-  const result = await sfFetch(client, tokenId, "/staffing/my-shifts");
+  const [shiftsResult, ownedResult] = await Promise.all([
+    sfFetch(client, tokenId, "/staffing/my-shifts"),
+    sfFetch(client, tokenId, "/staffing/owned-sessions"),
+  ]);
 
-  if (!result.ok) {
+  if (!shiftsResult.ok) {
     await client.chat.postEphemeral({
       channel: channelId,
       user: userId,
-      text: `Error fetching shifts: ${JSON.stringify(result.data)}`,
+      text: `Error fetching shifts: ${JSON.stringify(shiftsResult.data)}`,
     });
     return;
   }
 
-  const shifts = result.data as unknown as ShiftData[];
+  const shifts = shiftsResult.data as unknown as ShiftData[];
+  const ownedSessions = ownedResult.ok
+    ? (ownedResult.data as unknown as OwnedSessionData[])
+    : [];
 
   const blocks: Record<string, unknown>[] = [];
 
@@ -51,6 +105,10 @@ async function postShiftList(
       text: { type: "mrkdwn", text: headerPrefix },
     });
     blocks.push({ type: "divider" });
+  }
+
+  if (ownedSessions.length > 0) {
+    blocks.push(...ownedSessionBlocks(ownedSessions));
   }
 
   blocks.push({
