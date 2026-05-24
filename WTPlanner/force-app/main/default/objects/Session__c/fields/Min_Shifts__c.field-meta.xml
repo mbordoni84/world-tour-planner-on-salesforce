@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Min_Shifts__c</fullName>
     <defaultValue>1</defaultValue>
+    <description>Minimum number of staff shifts required per time slot for this session</description>
     <externalId>false</externalId>
     <label>Min Shifts Needed</label>
     <precision>4</precision>

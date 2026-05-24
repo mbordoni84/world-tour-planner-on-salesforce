@@ -142,13 +142,15 @@ public with sharing class ShiftTriggerHandler {
         }
 
         Map<Id, Shift__c> shiftMap = new Map<Id, Shift__c>([
-            SELECT Id, Start_Time__c, End_Time__c, Session__r.Name
+            SELECT Id, Start_Time__c, End_Time__c,
+                   Session__c, Session__r.Name,
+                   Session__r.session_owner__c, Session__r.session_owner__r.Email
             FROM Shift__c
             WHERE Id IN :shiftIds
         ]);
 
         Map<Id, User> userMap = new Map<Id, User>([
-            SELECT Id, Email FROM User WHERE Id IN :userIds
+            SELECT Id, Email, Name FROM User WHERE Id IN :userIds
         ]);
 
         String webhookUrl = Label.Slack_Shift_Webhook_URL;
@@ -156,7 +158,37 @@ public with sharing class ShiftTriggerHandler {
             return;
         }
 
+        // Collect session IDs for owner notifications
+        Set<Id> sessionIds = new Set<Id>();
+        for (Shift__c shift : shiftMap.values()) {
+            if (shift.Session__c != null && shift.Session__r.session_owner__c != null) {
+                sessionIds.add(shift.Session__c);
+            }
+        }
+
+        // Query all sibling shifts for owner recap
+        Map<Id, List<Map<String, Object>>> sessionShiftsMap = new Map<Id, List<Map<String, Object>>>();
+        if (!sessionIds.isEmpty()) {
+            for (Shift__c s : [
+                SELECT Id, Start_Time__c, End_Time__c, User__r.Name, Session__c
+                FROM Shift__c
+                WHERE Session__c IN :sessionIds
+                ORDER BY Start_Time__c
+            ]) {
+                if (!sessionShiftsMap.containsKey(s.Session__c)) {
+                    sessionShiftsMap.put(s.Session__c, new List<Map<String, Object>>());
+                }
+                sessionShiftsMap.get(s.Session__c).add(new Map<String, Object>{
+                    'startTime' => formatTime(s.Start_Time__c),
+                    'endTime' => formatTime(s.End_Time__c),
+                    'assignedUserName' => s.User__r != null ? s.User__r.Name : null
+                });
+            }
+        }
+
         List<String> payloads = new List<String>();
+        List<String> ownerPayloads = new List<String>();
+
         for (ShiftChangeEvent evt : events) {
             Shift__c shift = shiftMap.get(evt.shiftId);
             User u = userMap.get(evt.userId);
@@ -165,16 +197,40 @@ public with sharing class ShiftTriggerHandler {
             String sessionName = shift.Session__r != null ? shift.Session__r.Name : 'Unknown';
             String shiftTime = formatTime(shift.Start_Time__c) + ' - ' + formatTime(shift.End_Time__c);
 
+            // User notification (existing)
             payloads.add(JSON.serialize(new Map<String, Object>{
                 'user_email' => u.Email,
                 'session_name' => sessionName,
                 'shift_time' => shiftTime,
                 'change_type' => evt.changeType
             }));
+
+            // Owner notification (new)
+            if (shift.Session__r.session_owner__c != null
+                && shift.Session__r.session_owner__c != evt.userId) {
+                String ownerEmail = shift.Session__r.session_owner__r.Email;
+                List<Map<String, Object>> sessionShifts = sessionShiftsMap.get(shift.Session__c);
+
+                ownerPayloads.add(JSON.serialize(new Map<String, Object>{
+                    'owner_email' => ownerEmail,
+                    'session_name' => sessionName,
+                    'changed_user_name' => u.Name,
+                    'shift_time' => shiftTime,
+                    'change_type' => evt.changeType,
+                    'shifts' => JSON.serialize(sessionShifts != null ? sessionShifts : new List<Map<String, Object>>())
+                }));
+            }
         }
 
         if (!payloads.isEmpty()) {
             sendSlackNotifications(webhookUrl, payloads);
+        }
+
+        if (!ownerPayloads.isEmpty()) {
+            String ownerWebhookUrl = Label.Slack_Owner_Webhook_URL;
+            if (String.isNotBlank(ownerWebhookUrl) && ownerWebhookUrl != 'PASTE_WEBHOOK_URL_HERE') {
+                sendSlackNotifications(ownerWebhookUrl, ownerPayloads);
+            }
         }
     }
 

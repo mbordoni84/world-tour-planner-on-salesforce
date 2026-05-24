@@ -5,6 +5,7 @@ import AvailableWorkflow from "./workflows/available_workflow.ts";
 import OverlapsWorkflow from "./workflows/overlaps_workflow.ts";
 import RenderHomeWorkflow from "./workflows/render_home_workflow.ts";
 import NotifyShiftChangeWorkflow from "./workflows/notify_shift_change_workflow.ts";
+import NotifyOwnerWorkflow from "./workflows/notify_owner_workflow.ts";
 import DailyDigestWorkflow from "./workflows/daily_digest_workflow.ts";
 import RequestAccountWorkflow from "./workflows/request_account_workflow.ts";
 import DisconnectWorkflow from "./workflows/disconnect_workflow.ts";
@@ -21,6 +22,7 @@ export default Manifest({
     OverlapsWorkflow,
     RenderHomeWorkflow,
     NotifyShiftChangeWorkflow,
+    NotifyOwnerWorkflow,
     DailyDigestWorkflow,
     RequestAccountWorkflow,
     DisconnectWorkflow,

@@ -18,8 +18,9 @@ public with sharing class AgentAction_GetMyShifts {
     public static List<Result> execute(List<Request> requests) {
         List<Shift__c> shifts = [
             SELECT Name, Start_Time__c, End_Time__c, Has_Overlap__c,
-                   Session__r.Name, Session__r.Location__c,
-                   Session__r.Session_Type__r.Name
+                   Session__r.Id, Session__r.Name, Session__r.Location__c,
+                   Session__r.Session_Type__r.Name,
+                   Session__r.session_owner__r.Name
             FROM Shift__c
             WHERE User__c = :UserInfo.getUserId()
             ORDER BY Start_Time__c
@@ -34,8 +35,9 @@ public with sharing class AgentAction_GetMyShifts {
             String overlap = sh.Has_Overlap__c ? ' !! OVERLAP' : '';
             if (sh.Has_Overlap__c) hasOverlaps = true;
 
-            lines.add('- ' + sh.Session__r.Name + ' (' + sh.Session__r.Session_Type__r.Name + ') at ' +
-                       sh.Session__r.Location__c + ', ' + timeRange + overlap);
+            String ownerName = sh.Session__r.session_owner__r != null ? sh.Session__r.session_owner__r.Name : 'N/A';
+            lines.add('- ' + sh.Session__r.Name + ' (' + sh.Session__r.Session_Type__r.Name + ') [Session ID: ' + sh.Session__r.Id + '] at ' +
+                       sh.Session__r.Location__c + ', ' + timeRange + ' | Owner: ' + ownerName + ' [Shift ID: ' + sh.Id + ']' + overlap);
         }
 
         Result result = new Result();

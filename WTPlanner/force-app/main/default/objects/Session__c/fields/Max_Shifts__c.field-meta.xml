@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Max_Shifts__c</fullName>
     <defaultValue>5</defaultValue>
+    <description>Maximum number of staff shifts allowed per time slot for this session</description>
     <externalId>false</externalId>
     <label>Max Shifts Allowed</label>
     <precision>4</precision>

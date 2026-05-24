@@ -2,6 +2,13 @@ import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import { sfFetch } from "../lib/sf_client.ts";
 import { type ShiftData, shiftListBlocks } from "../views/shift_blocks.ts";
 
+interface OwnedSessionShift {
+  startTime: string;
+  endTime: string;
+  assignedUserName: string | null;
+  isClaimed: boolean;
+}
+
 interface OwnedSessionData {
   id: string;
   name: string;
@@ -11,6 +18,7 @@ interface OwnedSessionData {
   claimedShifts: number;
   staffingStatus: string;
   isFrozen: boolean;
+  shifts: OwnedSessionShift[];
 }
 
 export const GetMyShiftsDefinition = DefineFunction({
@@ -55,6 +63,17 @@ function ownedSessionBlocks(
 
   for (const session of sessions) {
     const frozen = session.isFrozen ? "  :lock: _Frozen_" : "";
+
+    let shiftLines = "";
+    if (session.shifts && session.shifts.length > 0) {
+      shiftLines = "\n" + session.shifts.map((s) => {
+        if (s.isClaimed && s.assignedUserName) {
+          return `:white_check_mark: ${s.startTime} - ${s.endTime} — ${s.assignedUserName}`;
+        }
+        return `:white_large_square: ${s.startTime} - ${s.endTime} — _Open_`;
+      }).join("\n");
+    }
+
     blocks.push({
       type: "section",
       text: {
@@ -62,7 +81,7 @@ function ownedSessionBlocks(
         text:
           `*${session.name}*${frozen}\n${session.claimedShifts}/${session.totalShifts} shifts filled  |  ${
             session.location ?? "TBD"
-          }  |  _${session.sessionType ?? ""}_\n_${session.staffingStatus}_`,
+          }  |  _${session.sessionType ?? ""}_${shiftLines}`,
       },
     });
     blocks.push({ type: "divider" });

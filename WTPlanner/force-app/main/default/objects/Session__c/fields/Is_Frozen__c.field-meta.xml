@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Is_Frozen__c</fullName>
     <defaultValue>false</defaultValue>
+    <description>When true, this session is locked and staff cannot claim or drop shifts</description>
     <label>Is Frozen</label>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>

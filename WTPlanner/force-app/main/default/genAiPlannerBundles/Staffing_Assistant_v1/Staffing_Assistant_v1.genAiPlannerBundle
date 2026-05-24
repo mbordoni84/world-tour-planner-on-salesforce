@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Helps event staff manage shift assignments — view schedule, browse sessions, claim/drop shifts, check overlaps</description>
+    <localTopicLinks>
+        <genAiPluginName>agent_router_16jJ9000000L1dM</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>off_topic_16jJ9000000L1dM</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>shift_management_16jJ9000000L1dM</genAiPluginName>
+    </localTopicLinks>
+    <localTopics>
+        <fullName>shift_management_16jJ9000000L1dM</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Help users view their shifts, browse available sessions, claim/drop shifts, and check overlaps</description>
+        <developerName>shift_management_16jJ9000000L1dM</developerName>
+        <genAiPluginInstructions>
+            <description>You are the World Tour Staffing Assistant, an AI agent that helps
+event staff manage their shift assignments. You help users view
+their schedule, browse available sessions, claim and drop shifts,
+and check for time conflicts. You are concise, friendly, and
+proactive about warning users of scheduling overlaps.
+You are an AI assistant, not a human.</description>
+            <developerName>instruction0_179J9000000H5R5</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179J9000000H5R5</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localActionLinks>
+            <functionName>drop_shift_179J9000000H5R5</functionName>
+        </localActionLinks>
+        <localActionLinks>
+            <functionName>get_my_shifts_179J9000000H5R5</functionName>
+        </localActionLinks>
+        <localActionLinks>
+            <functionName>check_overlaps_179J9000000H5R5</functionName>
+        </localActionLinks>
+        <localActionLinks>
+            <functionName>get_available_sessions_179J9000000H5R5</functionName>
+        </localActionLinks>
+        <localActionLinks>
+            <functionName>claim_shift_179J9000000H5R5</functionName>
+        </localActionLinks>
+        <localActions>
+            <fullName>get_my_shifts_179J9000000H5R5</fullName>
+            <description>Returns all shifts assigned to the current user with session details and overlap warnings</description>
+            <developerName>get_my_shifts_179J9000000H5R5</developerName>
+            <invocationTarget>AgentAction_GetMyShifts</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+            <localDeveloperName>get_my_shifts</localDeveloperName>
+            <masterLabel>Get My Shifts</masterLabel>
+        </localActions>
+        <localActions>
+            <fullName>get_available_sessions_179J9000000H5R5</fullName>
+            <description>Returns sessions that still have unclaimed shifts available for staffing</description>
+            <developerName>get_available_sessions_179J9000000H5R5</developerName>
+            <invocationTarget>AgentAction_GetAvailableSessions</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+            <localDeveloperName>get_available_sessions</localDeveloperName>
+            <masterLabel>Get Available Sessions</masterLabel>
+        </localActions>
+        <localActions>
+            <fullName>check_overlaps_179J9000000H5R5</fullName>
+            <description>Checks if the current user has any overlapping shift assignments</description>
+            <developerName>check_overlaps_179J9000000H5R5</developerName>
+            <invocationTarget>AgentAction_CheckOverlaps</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+            <localDeveloperName>check_overlaps</localDeveloperName>
+            <masterLabel>Check Overlaps</masterLabel>
+        </localActions>
+        <localActions>
+            <fullName>drop_shift_179J9000000H5R5</fullName>
+            <description>Drops (unassigns) the current user&apos;s shift for a given session name</description>
+            <developerName>drop_shift_179J9000000H5R5</developerName>
+            <invocationTarget>AgentAction_DropShift</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+            <localDeveloperName>drop_shift</localDeveloperName>
+            <masterLabel>Drop Shift</masterLabel>
+        </localActions>
+        <localActions>
+            <fullName>claim_shift_179J9000000H5R5</fullName>
+            <description>Claims the first available shift for a given session name and assigns it to the current user</description>
+            <developerName>claim_shift_179J9000000H5R5</developerName>
+            <invocationTarget>AgentAction_ClaimShift</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+            <localDeveloperName>claim_shift</localDeveloperName>
+            <masterLabel>Claim Shift</masterLabel>
+        </localActions>
+        <localDeveloperName>shift_management</localDeveloperName>
+        <masterLabel>Shift Management</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>agent_router_16jJ9000000L1dM</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Route user requests to the appropriate subagent</description>
+        <developerName>agent_router_16jJ9000000L1dM</developerName>
+        <genAiPluginInstructions>
+            <description>You are the World Tour Staffing Assistant, an AI agent that helps
+event staff manage their shift assignments. You help users view
+their schedule, browse available sessions, claim and drop shifts,
+and check for time conflicts. You are concise, friendly, and
+proactive about warning users of scheduling overlaps.
+You are an AI assistant, not a human.</description>
+            <developerName>instruction0_179J9000000H5R4</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179J9000000H5R4</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>agent_router</localDeveloperName>
+        <masterLabel>Agent Router</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>off_topic_16jJ9000000L1dM</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Redirect off-topic requests back to staffing topics</description>
+        <developerName>off_topic_16jJ9000000L1dM</developerName>
+        <genAiPluginInstructions>
+            <description>You are the World Tour Staffing Assistant, an AI agent that helps
+event staff manage their shift assignments. You help users view
+their schedule, browse available sessions, claim and drop shifts,
+and check for time conflicts. You are concise, friendly, and
+proactive about warning users of scheduling overlaps.
+You are an AI assistant, not a human.</description>
+            <developerName>instruction0_179J9000000H5R3</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179J9000000H5R3</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>off_topic</localDeveloperName>
+        <masterLabel>Off Topic</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <masterLabel>Staffing Assistant</masterLabel>
+    <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+</GenAiPlannerBundle>

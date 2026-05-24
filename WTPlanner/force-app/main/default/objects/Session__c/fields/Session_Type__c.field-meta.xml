@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Session_Type__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>The category or type of session (e.g., Booth, Theatre, Trailhead)</description>
     <label>Session Type</label>
     <referenceTo>Session_Type__c</referenceTo>
     <relationshipLabel>Sessions</relationshipLabel>

@@ -57,7 +57,8 @@ public with sharing class AgentAction_GetAvailableSessions {
                     claimedBySlot.put(slotKey, (claimedBySlot.containsKey(slotKey) ? claimedBySlot.get(slotKey) : 0) + 1);
                 } else {
                     String timeStr = StaffingAgentActions.formatTime(sh.Start_Time__c) + '-' +
-                                     StaffingAgentActions.formatTime(sh.End_Time__c);
+                                     StaffingAgentActions.formatTime(sh.End_Time__c) +
+                                     ' [Shift ID: ' + sh.Id + ']';
                     String overlapWarning = getOverlapWarning(sh, myShifts);
                     if (String.isNotBlank(overlapWarning)) {
                         timeStr += ' ' + overlapWarning;
@@ -85,7 +86,7 @@ public with sharing class AgentAction_GetAvailableSessions {
                     staffingInfo += ' reached';
                 }
 
-                String line = '- ' + s.Name + ' (' + s.Session_Type__r.Name + ') at ' + s.Location__c +
+                String line = '- ' + s.Name + ' (' + s.Session_Type__r.Name + ') [ID: ' + s.Id + '] at ' + s.Location__c +
                               ' — staffing: ' + staffingInfo + '\n' +
                               '  Available shifts: ' + String.join(availableShiftTimes, ', ');
                 lines.add(line);
