@@ -59,7 +59,8 @@ public with sharing class AgentAction_GetSessionStaffing {
                 'WARNING: BELOW minimum staffing (' + claimed + '/' + minRequired + '). Removing anyone will worsen the situation.' :
                 'Removing one person would ' + (claimed - 1 < minRequired ? 'drop below minimum staffing.' : 'still meet minimum requirements.');
 
-            sessionBlocks.add('Session: ' + sess.Name + ' (' + sess.Session_Type__r.Name + ') [ID: ' + sess.Id + ']' + '\n' +
+            sessionBlocks.add('Session: ' + sess.Name + ' [ID: ' + sess.Id + ']' + '\n' +
+                'Type: ' + sess.Session_Type__r.Name + '\n' +
                 'Location: ' + sess.Location__c + '\n' +
                 'Owner: ' + ownerName + '\n' +
                 'Frozen: ' + (sess.Is_Frozen__c ? 'Yes' : 'No') + '\n' +

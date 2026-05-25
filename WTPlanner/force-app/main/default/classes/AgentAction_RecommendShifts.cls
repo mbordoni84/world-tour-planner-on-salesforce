@@ -85,7 +85,7 @@ public with sharing class AgentAction_RecommendShifts {
             Recommendation rec = recommendations[i];
             String timeRange = StaffingAgentActions.formatTime(rec.startTime) + ' - ' +
                                StaffingAgentActions.formatTime(rec.endTime);
-            lines.add((i + 1) + '. ' + rec.sessionName + ' (' + rec.sessionType + ') at ' + rec.location +
+            lines.add((i + 1) + '. ' + rec.sessionName + ' | Type: ' + rec.sessionType + ' | Location: ' + rec.location +
                 '\n   Time: ' + timeRange +
                 '\n   Reason: Needs ' + rec.staffingGap + ' more staff (min: ' + rec.minRequired + '). No overlap with your schedule.');
         }

@@ -36,8 +36,8 @@ public with sharing class AgentAction_GetMyShifts {
             if (sh.Has_Overlap__c) hasOverlaps = true;
 
             String ownerName = sh.Session__r.session_owner__r != null ? sh.Session__r.session_owner__r.Name : 'N/A';
-            lines.add('- ' + sh.Session__r.Name + ' (' + sh.Session__r.Session_Type__r.Name + ') [Session ID: ' + sh.Session__r.Id + '] at ' +
-                       sh.Session__r.Location__c + ', ' + timeRange + ' | Owner: ' + ownerName + ' [Shift ID: ' + sh.Id + ']' + overlap);
+            lines.add('- ' + sh.Session__r.Name + ' [Session ID: ' + sh.Session__r.Id + ']\n' +
+                       '  Type: ' + sh.Session__r.Session_Type__r.Name + ' | Location: ' + sh.Session__r.Location__c + ' | ' + timeRange + ' | Owner: ' + ownerName + ' [Shift ID: ' + sh.Id + ']' + overlap);
         }
 
         Result result = new Result();

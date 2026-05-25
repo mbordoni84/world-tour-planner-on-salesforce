@@ -49,8 +49,8 @@ public with sharing class AgentAction_GetUserInfo {
                                    StaffingAgentActions.formatTime(sh.End_Time__c);
                 String overlap = sh.Has_Overlap__c ? ' [OVERLAP]' : '';
                 if (sh.Has_Overlap__c) hasOverlaps = true;
-                shiftLines.add('- ' + sh.Session__r.Name + ' (' + sh.Session__r.Session_Type__r.Name + ') at ' +
-                    sh.Session__r.Location__c + ', ' + timeRange + ' [Shift: ' + sh.Id + ']' + overlap);
+                shiftLines.add('- ' + sh.Session__r.Name + ' | Type: ' + sh.Session__r.Session_Type__r.Name + ' | Location: ' +
+                    sh.Session__r.Location__c + ' | ' + timeRange + ' [Shift: ' + sh.Id + ']' + overlap);
             }
             sections.add('\nAssigned Shifts (' + shifts.size() + '):');
             sections.add(String.join(shiftLines, '\n'));
@@ -79,8 +79,8 @@ public with sharing class AgentAction_GetUserInfo {
                 }
                 Integer minReq = sess.Min_Shifts__c != null ? (Integer)sess.Min_Shifts__c : 1;
                 String status = claimed < minReq ? 'NEEDS STAFF' : 'OK';
-                sessionLines.add('- ' + sess.Name + ' (' + sess.Session_Type__r.Name + ') [ID: ' + sess.Id + '] at ' +
-                    sess.Location__c + ' — ' + claimed + '/' + sess.Shifts__r.size() + ' filled [' + status + ']');
+                sessionLines.add('- ' + sess.Name + ' [ID: ' + sess.Id + '] | Type: ' + sess.Session_Type__r.Name + ' | Location: ' +
+                    sess.Location__c + ' | ' + claimed + '/' + sess.Shifts__r.size() + ' filled [' + status + ']');
             }
             sections.add('\nOwned Sessions (' + ownedSessions.size() + '):');
             sections.add(String.join(sessionLines, '\n'));

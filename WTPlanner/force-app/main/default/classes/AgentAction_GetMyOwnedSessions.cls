@@ -47,7 +47,8 @@ public with sharing class AgentAction_GetMyOwnedSessions {
                            (claimed == sess.Shifts__r.size() ? 'FULLY STAFFED' : 'Min reached');
             String frozen = sess.Is_Frozen__c ? ' [FROZEN]' : '';
 
-            sessionBlocks.add(sess.Name + ' (' + sess.Session_Type__r.Name + ') [ID: ' + sess.Id + '] at ' + sess.Location__c + frozen +
+            sessionBlocks.add(sess.Name + ' [ID: ' + sess.Id + ']' + frozen +
+                '\n  Type: ' + sess.Session_Type__r.Name + ' | Location: ' + sess.Location__c +
                 '\n  Status: ' + status + ' (' + claimed + '/' + sess.Shifts__r.size() + ' shifts, min: ' + minRequired + ')' +
                 '\n' + String.join(shiftLines, '\n'));
         }

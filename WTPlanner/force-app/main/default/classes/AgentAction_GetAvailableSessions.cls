@@ -86,8 +86,8 @@ public with sharing class AgentAction_GetAvailableSessions {
                     staffingInfo += ' reached';
                 }
 
-                String line = '- ' + s.Name + ' (' + s.Session_Type__r.Name + ') [ID: ' + s.Id + '] at ' + s.Location__c +
-                              ' — staffing: ' + staffingInfo + '\n' +
+                String line = '- ' + s.Name + ' [ID: ' + s.Id + '] | Type: ' + s.Session_Type__r.Name + ' | Location: ' + s.Location__c +
+                              ' | Staffing: ' + staffingInfo + '\n' +
                               '  Available shifts: ' + String.join(availableShiftTimes, ', ');
                 lines.add(line);
                 count++;
