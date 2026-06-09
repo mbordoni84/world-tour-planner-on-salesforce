@@ -42,30 +42,6 @@
 
     <!-- Apex Class Access -->
     <classAccesses>
-        <apexClass>StaffingAgentActions</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>AgentAction_GetAvailableSessions</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>AgentAction_GetMyShifts</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>AgentAction_ClaimShift</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>AgentAction_DropShift</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>AgentAction_CheckOverlaps</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
         <apexClass>ShiftMarketplaceController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -131,6 +107,11 @@
     </fieldPermissions>
 
     <!-- Session__c permissions (Read Only) -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Session__c.session_owner__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>Session__c.Event__c</field>

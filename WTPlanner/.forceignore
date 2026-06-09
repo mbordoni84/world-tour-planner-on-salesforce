@@ -10,3 +10,23 @@ package.xml
 
 # LWC Jest
 **/__tests__/**
+
+# Third-party namespaced fields on User (maps, pi, FSSK, EDY_ORGCUSTOM)
+# These are installed packages in the dev org - not packageable
+**/objects/User/fields/maps__*.field-meta.xml
+**/objects/User/fields/pi__*.field-meta.xml
+**/objects/User/fields/FSSK__*.field-meta.xml
+**/objects/User/fields/EDY_ORGCUSTOM__*.field-meta.xml
+
+# Standard User fields that don't exist in all orgs
+**/objects/User/fields/CurrencyIsoCode.field-meta.xml
+**/objects/User/fields/DefaultCurrencyIsoCode.field-meta.xml
+
+# ShiftWorkTopic is not a valid custom object (not __c/__b/__e)
+**/objects/ShiftWorkTopic/**
+
+# Connected app for Slack - configured post-install
+**/connectedApps/Staffing_Slack_App.connectedApp-meta.xml
+
+# Remote site settings - configured post-install
+**/remoteSiteSettings/**
