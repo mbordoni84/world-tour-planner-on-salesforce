@@ -228,34 +228,34 @@ export default class StaffingDashboard extends LightningElement {
     }
 
     get fillRateFormatted() {
-        return this.summary.fillRate != null ? this.summary.fillRate + '%' : '0%';
+        return this.summary?.fillRate != null ? this.summary.fillRate + '%' : '0%';
     }
 
     get fillRateClass() {
-        if (!this.summary.fillRate) return 'kpi-value';
+        if (!this.summary?.fillRate) return 'kpi-value';
         if (this.summary.fillRate >= 80) return 'kpi-value kpi-success';
         if (this.summary.fillRate >= 50) return 'kpi-value kpi-warning';
         return 'kpi-value kpi-danger';
     }
 
     get totalShiftsDisplay() {
-        return this.summary.totalShifts || 0;
+        return this.summary?.totalShifts || 0;
     }
 
     get assignedDisplay() {
-        return this.summary.assigned || 0;
+        return this.summary?.assigned || 0;
     }
 
     get unassignedDisplay() {
-        return this.summary.unassigned || 0;
+        return this.summary?.unassigned || 0;
     }
 
     get overlapsDisplay() {
-        return this.summary.overlaps || 0;
+        return this.summary?.overlaps || 0;
     }
 
     get uniqueStaffedDisplay() {
-        return this.summary.uniqueStaffed || 0;
+        return this.summary?.uniqueStaffed || 0;
     }
 
     get hasLeaderboard() {
@@ -288,22 +288,22 @@ export default class StaffingDashboard extends LightningElement {
     }
 
     get totalHoursDisplay() {
-        return this.summary.totalHours != null ? this.summary.totalHours + 'h' : '0h';
+        return this.summary?.totalHours != null ? this.summary.totalHours + 'h' : '0h';
     }
 
     get assignedHoursDisplay() {
-        return this.summary.assignedHours != null ? this.summary.assignedHours + 'h' : '0h';
+        return this.summary?.assignedHours != null ? this.summary.assignedHours + 'h' : '0h';
     }
 
     get remainingHours() {
-        const total = this.summary.totalHours || 0;
-        const assigned = this.summary.assignedHours || 0;
+        const total = this.summary?.totalHours || 0;
+        const assigned = this.summary?.assignedHours || 0;
         return (total - assigned).toFixed(1);
     }
 
     get hoursBarWidth() {
-        const total = this.summary.totalHours || 0;
-        const assigned = this.summary.assignedHours || 0;
+        const total = this.summary?.totalHours || 0;
+        const assigned = this.summary?.assignedHours || 0;
         if (total === 0) return 'width: 0%';
         return 'width: ' + Math.min((assigned / total) * 100, 100).toFixed(1) + '%';
     }
