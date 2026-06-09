@@ -14,4 +14,8 @@
         <field>Slack_Owner_Webhook_URL__c</field>
         <value xsi:nil="true"/>
     </values>
+    <values>
+        <field>Allowed_Email_Domain__c</field>
+        <value xsi:nil="true"/>
+    </values>
 </CustomMetadata>

@@ -17,7 +17,7 @@ public with sharing class OverlapDashboardController {
 
             query += 'ORDER BY User__r.Name, Start_Time__c';
 
-            List<Shift__c> shifts = Database.query(query);
+            List<Shift__c> shifts = Database.query(query, AccessLevel.USER_MODE);
 
             Map<Id, List<Shift__c>> shiftsByUser = new Map<Id, List<Shift__c>>();
             for (Shift__c shift : shifts) {
@@ -74,7 +74,7 @@ public with sharing class OverlapDashboardController {
             }
 
             shift.User__c = null;
-            update shift;
+            update as user shift;
         } catch (AuraHandledException e) {
             throw e;
         } catch (Exception e) {

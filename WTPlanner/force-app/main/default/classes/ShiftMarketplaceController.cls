@@ -86,7 +86,7 @@ public with sharing class ShiftMarketplaceController {
             }
 
             shift.User__c = UserInfo.getUserId();
-            update shift;
+            update as user shift;
 
             return shift.Id;
         } catch (AuraHandledException e) {
@@ -151,13 +151,13 @@ public with sharing class ShiftMarketplaceController {
                     End_Time__c = existingShifts.isEmpty() ?
                         Time.newInstance(17, 0, 0, 0) : existingShifts[0].End_Time__c
                 );
-                insert newShift;
+                insert as user newShift;
                 return newShift.Id;
             }
 
             Shift__c shift = availableShifts[0];
             shift.User__c = UserInfo.getUserId();
-            update shift;
+            update as user shift;
             return shift.Id;
         } catch (AuraHandledException e) {
             throw e;
@@ -189,7 +189,7 @@ public with sharing class ShiftMarketplaceController {
             }
 
             shift.User__c = null;
-            update shift;
+            update as user shift;
         } catch (AuraHandledException e) {
             throw e;
         } catch (Exception e) {

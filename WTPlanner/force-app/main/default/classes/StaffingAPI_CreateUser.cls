@@ -16,8 +16,14 @@ global without sharing class StaffingAPI_CreateUser {
                 return;
             }
 
-            if (!email.trim().toLowerCase().endsWith('@salesforce.com')) {
-                sendError(res, 400, 'Only @salesforce.com email addresses are allowed.');
+            List<Staffing_Setting__mdt> settingRows = [
+                SELECT Allowed_Email_Domain__c FROM Staffing_Setting__mdt
+                WHERE DeveloperName = 'Default' LIMIT 1
+            ];
+            String allowedDomain = settingRows.isEmpty() ? null : settingRows[0].Allowed_Email_Domain__c;
+            if (String.isNotBlank(allowedDomain)
+                    && !email.trim().toLowerCase().endsWith('@' + allowedDomain.trim().toLowerCase())) {
+                sendError(res, 400, 'Only @' + allowedDomain.trim() + ' email addresses are allowed.');
                 return;
             }
 
