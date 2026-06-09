@@ -17,6 +17,9 @@ package.xml
 **/objects/User/fields/pi__*.field-meta.xml
 **/objects/User/fields/FSSK__*.field-meta.xml
 **/objects/User/fields/EDY_ORGCUSTOM__*.field-meta.xml
+**/objects/User/fields/et4ae5__*.field-meta.xml
+**/objects/User/fields/inov8__*.field-meta.xml
+**/objects/User/fields/PortalRole.field-meta.xml
 
 # Standard User fields that don't exist in all orgs
 **/objects/User/fields/CurrencyIsoCode.field-meta.xml
@@ -30,3 +33,10 @@ package.xml
 
 # Remote site settings - configured post-install
 **/remoteSiteSettings/**
+
+# Bots (Slack bot definitions, not packageable here)
+**/bots/**
+
+# Reports and report types - not part of app package
+**/reports/**
+**/reportTypes/**
