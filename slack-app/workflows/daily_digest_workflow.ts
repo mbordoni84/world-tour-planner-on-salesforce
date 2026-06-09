@@ -1,6 +1,5 @@
 import { DefineWorkflow, Schema } from "deno-slack-sdk/mod.ts";
 import { PostChannelDigestDefinition } from "../functions/post_channel_digest.ts";
-import { PostPersonalDigestsDefinition } from "../functions/post_personal_digests.ts";
 
 const DailyDigestWorkflow = DefineWorkflow({
   callback_id: "daily_digest_workflow",
@@ -15,12 +14,6 @@ const DailyDigestWorkflow = DefineWorkflow({
 
 DailyDigestWorkflow.addStep(PostChannelDigestDefinition, {
   channel_id: DailyDigestWorkflow.inputs.channel_id,
-  sf_token_id: {
-    credential_source: "END_USER",
-  },
-});
-
-DailyDigestWorkflow.addStep(PostPersonalDigestsDefinition, {
   sf_token_id: {
     credential_source: "END_USER",
   },

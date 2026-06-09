@@ -41,10 +41,61 @@ export default class MySchedule extends NavigationMixin(LightningElement) {
         this.wiredMyShiftsResult = result;
         if (!this.selectedUserId && result.data) {
             this.myShifts = this.mapShifts(result.data);
-            getOwnedSessions().then(data => { this.ownedSessions = data; }).catch(() => {});
+            getOwnedSessions()
+                .then(data => { this.ownedSessions = this.mapOwnedSessions(data); })
+                .catch(() => {});
         } else if (result.error) {
             this.showToast('Error', 'Error loading your schedule', 'error');
         }
+    }
+
+    mapOwnedSessions(data) {
+        if (!data) return [];
+        return data.map(session => {
+            const slots = this.buildSlots(session.shifts || []);
+            return {
+                ...session,
+                slots,
+                hasSlots: slots.length > 0
+            };
+        });
+    }
+
+    buildSlots(shifts) {
+        const byKey = new Map();
+        for (const sh of shifts) {
+            const key = `${sh.startTime}-${sh.endTime}`;
+            if (!byKey.has(key)) {
+                byKey.set(key, {
+                    key,
+                    startTime: sh.startTime,
+                    endTime: sh.endTime,
+                    timeLabel: `${sh.startTime} – ${sh.endTime}`,
+                    staffers: [],
+                    openCount: 0
+                });
+            }
+            const slot = byKey.get(key);
+            if (sh.isClaimed) {
+                slot.staffers.push(sh.assignedUserName || '(unknown)');
+            } else {
+                slot.openCount += 1;
+            }
+        }
+        return [...byKey.values()]
+            .sort((a, b) => a.startTime.localeCompare(b.startTime))
+            .map(slot => {
+                const hasStaffers = slot.staffers.length > 0;
+                const hasOpen = slot.openCount > 0;
+                return {
+                    ...slot,
+                    staffersLabel: hasStaffers ? slot.staffers.join(', ') : '',
+                    openLabel: hasOpen ? `${slot.openCount} open` : '',
+                    hasStaffers,
+                    hasOpen,
+                    fullyOpen: !hasStaffers && hasOpen
+                };
+            });
     }
 
     mapShifts(data) {
@@ -67,7 +118,8 @@ export default class MySchedule extends NavigationMixin(LightningElement) {
             this.myShifts = this.wiredMyShiftsResult?.data
                 ? this.mapShifts(this.wiredMyShiftsResult.data)
                 : [];
-            this.ownedSessions = await getOwnedSessions().catch(() => []);
+            const owned = await getOwnedSessions().catch(() => []);
+            this.ownedSessions = this.mapOwnedSessions(owned);
             return;
         }
         this.isLoading = true;
@@ -77,7 +129,7 @@ export default class MySchedule extends NavigationMixin(LightningElement) {
                 getOwnedSessionsForUser({ userId: this.selectedUserId })
             ]);
             this.myShifts = this.mapShifts(shifts);
-            this.ownedSessions = owned;
+            this.ownedSessions = this.mapOwnedSessions(owned);
         } catch (error) {
             this.showToast('Error', error.body?.message || 'Error loading schedule', 'error');
         } finally {

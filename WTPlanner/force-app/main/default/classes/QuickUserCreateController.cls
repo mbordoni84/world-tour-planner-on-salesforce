@@ -14,6 +14,15 @@ public without sharing class QuickUserCreateController {
             throw buildException('Only @salesforce.com email addresses are allowed');
         }
 
+        List<User> existing = [
+            SELECT Id, Name, Username FROM User
+            WHERE Email = :email.trim() AND IsActive = true LIMIT 1
+        ];
+        if (!existing.isEmpty()) {
+            throw buildException('An active user with email ' + email.trim()
+                + ' already exists: ' + existing[0].Name + ' (' + existing[0].Username + ')');
+        }
+
         try {
             Profile standardProfile = [
                 SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1

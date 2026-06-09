@@ -63,6 +63,26 @@
                                     <lightning-icon icon-name="utility:people" size="xx-small"></lightning-icon>
                                     <span>{session.claimedShifts} / {session.totalShifts} shifts filled</span>
                                 </div>
+                                <template if:true={session.hasSlots}>
+                                    <div class="owned-session-slots">
+                                        <template for:each={session.slots} for:item="slot">
+                                            <div key={slot.key} class="slot-row">
+                                                <span class="slot-time">{slot.timeLabel}</span>
+                                                <span class="slot-staffers">
+                                                    <template if:true={slot.hasStaffers}>{slot.staffersLabel}</template>
+                                                    <template if:true={slot.fullyOpen}>
+                                                        <span class="slot-open">Unstaffed</span>
+                                                    </template>
+                                                    <template if:false={slot.fullyOpen}>
+                                                        <template if:true={slot.hasOpen}>
+                                                            <span class="slot-open-tag">+ {slot.openLabel}</span>
+                                                        </template>
+                                                    </template>
+                                                </span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
                             </div>
                         </template>
                     </div>

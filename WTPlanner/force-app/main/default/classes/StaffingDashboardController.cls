@@ -30,12 +30,17 @@ public with sharing class StaffingDashboardController {
             // session type KPI accumulators
             Map<String, SessionTypeKpi> kpiByType = new Map<String, SessionTypeKpi>();
 
+            Integer mandatoryUnassigned = 0;
+
             for (Session__c session : sessions) {
                 SessionStaffing ss = new SessionStaffing(session);
                 sessionList.add(ss);
 
                 totalShifts += ss.totalShifts;
                 assignedCount += ss.claimed;
+                if (ss.claimed < ss.minShifts) {
+                    mandatoryUnassigned += (ss.minShifts - ss.claimed);
+                }
 
                 String typeName = ss.sessionType != null ? ss.sessionType : 'Unknown';
                 if (ss.sessionType != null) {
@@ -91,7 +96,7 @@ public with sharing class StaffingDashboardController {
             }
             sessionTypeKpiList.sort(new SessionTypeKpiComparator());
 
-            Integer unassignedCount = totalShifts - assignedCount;
+            Integer unassignedCount = mandatoryUnassigned;
             Decimal fillRate = totalShifts > 0
                 ? ((Decimal)assignedCount / totalShifts * 100).setScale(1)
                 : 0;
