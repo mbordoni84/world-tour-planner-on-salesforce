@@ -1,6 +1,14 @@
 @isTest
 private class ShiftTriggerHandlerTest {
 
+    // Inject a disabled Slack setting so tests never attempt callouts
+    static {
+        ShiftTriggerHandler.slackSettingsOverride = (Staffing_Setting__mdt) JSON.deserialize(
+            '{"Slack_Notifications_Enabled__c":false}',
+            Staffing_Setting__mdt.class
+        );
+    }
+
     @testSetup
     static void setup() {
         Event__c event = new Event__c(Name = 'Test Event');
