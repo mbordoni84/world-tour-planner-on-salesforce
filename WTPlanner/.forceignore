@@ -16,6 +16,7 @@ package.xml
 **/objects/User/fields/maps__*.field-meta.xml
 **/objects/User/fields/pi__*.field-meta.xml
 **/objects/User/fields/FSSK__*.field-meta.xml
+**/objects/User/validationRules/FSSK__*.validationRule-meta.xml
 **/objects/User/fields/EDY_ORGCUSTOM__*.field-meta.xml
 **/objects/User/fields/et4ae5__*.field-meta.xml
 **/objects/User/fields/inov8__*.field-meta.xml
