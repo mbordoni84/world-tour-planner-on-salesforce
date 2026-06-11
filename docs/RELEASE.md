@@ -61,11 +61,15 @@ sf package install --package <new-04t-id> --target-org <new-event-org> --wait 10
 
 ## Dev Hub
 
-Currently using: `storm.973b1cdf0acdf3@salesforce.com` (prod org — will expire).
+Currently using: `matteo.bordoni.b78073148571@agentforce.com` (permanent Developer Edition).
 
-**Before the prod org expires**, re-create the package on your permanent Developer Edition:
-1. `sf org login web --set-default-dev-hub --alias devhub-permanent --instance-url https://login.salesforce.com`
-2. Enable Dev Hub + 2GP in that org's Setup
-3. `sf package create --name "World Tour Staffing" --package-type Unlocked --path force-app --no-namespace --target-dev-hub devhub-permanent`
-4. `sf package version create ...` as above
-5. Update `SFDX_AUTH_URL` secret in GitHub Actions
+Login:
+```bash
+sf org login web --set-default-dev-hub --alias devhub-permanent --instance-url https://orgfarm-86aafb3005-dev-ed.develop.my.salesforce.com
+```
+
+Update `SFDX_AUTH_URL` secret in GitHub Actions when the token expires:
+```bash
+sf org display --verbose --target-org devhub-permanent
+# copy the "Sfdx Auth Url" value → GitHub Settings → Secrets → SFDX_AUTH_URL
+```
