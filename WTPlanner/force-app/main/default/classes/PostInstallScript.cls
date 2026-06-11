@@ -14,8 +14,8 @@ global class PostInstallScript implements InstallHandler {
         Session_Type__c st_Keynote = new Session_Type__c(Name = 'Keynote', Event__c = ev.Id);
         Session_Type__c st_Theatre = new Session_Type__c(Name = 'Theatre', Event__c = ev.Id);
         Session_Type__c st_Trailhead = new Session_Type__c(Name = 'Trailhead', Event__c = ev.Id);
-        Session_Type__c st_Workshop__HOTs_ = new Session_Type__c(Name = 'Workshop (HOTs)', Event__c = ev.Id);
-        insert new List<Session_Type__c>{st_Agentforce_City, st_Agentforce_Labs, st_Booth, st_Breakout, st_Community_Networking, st_Keynote, st_Theatre, st_Trailhead, st_Workshop__HOTs_};
+        Session_Type__c st_WorkshopHOTs = new Session_Type__c(Name = 'Workshop (HOTs)', Event__c = ev.Id);
+        insert new List<Session_Type__c>{st_Agentforce_City, st_Agentforce_Labs, st_Booth, st_Breakout, st_Community_Networking, st_Keynote, st_Theatre, st_Trailhead, st_WorkshopHOTs};
 
         List<Session__c> sessionList = new List<Session__c>();
         sessionList.add(new Session__c(Name = 'Accenture', Session_Type__c = st_Breakout.Id, Min_Shifts__c = 1, Max_Shifts__c = 3));
@@ -27,8 +27,8 @@ global class PostInstallScript implements InstallHandler {
         sessionList.add(new Session__c(Name = 'Amplize', Session_Type__c = st_Breakout.Id, Min_Shifts__c = 1, Max_Shifts__c = 3));
         sessionList.add(new Session__c(Name = 'City Storefront 1 - Leapmotor', Session_Type__c = st_Agentforce_City.Id, Min_Shifts__c = 1, Max_Shifts__c = 5));
         sessionList.add(new Session__c(Name = 'City Storefront 2 - Trenitalia', Session_Type__c = st_Agentforce_City.Id, Min_Shifts__c = 1, Max_Shifts__c = 5));
-        sessionList.add(new Session__c(Name = 'Get Started with AF Builder and Agent Script (HOT)', Session_Type__c = st_Workshop__HOTs_.Id, Min_Shifts__c = 1, Max_Shifts__c = 4));
-        sessionList.add(new Session__c(Name = 'Get Started with Data 360 (HOT)', Session_Type__c = st_Workshop__HOTs_.Id, Min_Shifts__c = 1, Max_Shifts__c = 4));
+        sessionList.add(new Session__c(Name = 'Get Started with AF Builder and Agent Script (HOT)', Session_Type__c = st_WorkshopHOTs.Id, Min_Shifts__c = 1, Max_Shifts__c = 4));
+        sessionList.add(new Session__c(Name = 'Get Started with Data 360 (HOT)', Session_Type__c = st_WorkshopHOTs.Id, Min_Shifts__c = 1, Max_Shifts__c = 4));
         sessionList.add(new Session__c(Name = 'Keynote Backup Speakers', Session_Type__c = st_Keynote.Id, Min_Shifts__c = 1, Max_Shifts__c = 3));
         sessionList.add(new Session__c(Name = 'Keynote Presentation', Session_Type__c = st_Keynote.Id, Min_Shifts__c = 1, Max_Shifts__c = 3));
         sessionList.add(new Session__c(Name = 'Theatre 1 - B2B Commerce', Session_Type__c = st_Theatre.Id, Min_Shifts__c = 1, Max_Shifts__c = 3));
