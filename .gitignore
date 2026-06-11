@@ -60,3 +60,6 @@ Desktop.ini
 # Husky
 .husky/_
 Icon
+
+# Agentforce: generated artifacts from `sf agent publish` (do not commit)
+WTPlanner/force-app/main/default/genAiPlannerBundles/

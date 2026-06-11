@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <agentAccesses>
+        <agentName>Staffing_Assistant</agentName>
+        <enabled>true</enabled>
+    </agentAccesses>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Staffing Assistant Access</label>
-    <description>Reserved for future Agentforce agent access. Currently has no active permissions.</description>
+    <description>Grants access to the Staffing Assistant Agentforce agent in the Lightning Experience Copilot panel.</description>
 </PermissionSet>
