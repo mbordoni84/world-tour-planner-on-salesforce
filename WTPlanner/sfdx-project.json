@@ -6,8 +6,7 @@
       "path": "force-app",
       "default": true,
       "package": "World Tour Staffing",
-      "versionDescription": "",
-      "postInstallScript": "PostInstallScript"
+      "versionDescription": ""
     }
   ],
   "name": "World Tour Staffing App",
