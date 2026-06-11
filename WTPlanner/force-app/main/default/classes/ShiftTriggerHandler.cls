@@ -133,7 +133,28 @@ public with sharing class ShiftTriggerHandler {
         return (start1Ms < end2Ms) && (end1Ms > start2Ms);
     }
 
+    @TestVisible
+    private static Staffing_Setting__mdt slackSettingsOverride;
+
+    @TestVisible
+    private static Staffing_Setting__mdt getSlackSettings() {
+        if (slackSettingsOverride != null) return slackSettingsOverride;
+        List<Staffing_Setting__mdt> rows = [
+            SELECT Slack_Notifications_Enabled__c, Slack_Shift_Webhook_URL__c, Slack_Owner_Webhook_URL__c
+            FROM Staffing_Setting__mdt
+            WHERE DeveloperName = 'Default'
+            LIMIT 1
+        ];
+        return rows.isEmpty() ? null : rows[0];
+    }
+
     private void notifySlack(List<ShiftChangeEvent> events) {
+        Staffing_Setting__mdt settings = getSlackSettings();
+        if (settings == null || !settings.Slack_Notifications_Enabled__c) return;
+
+        String webhookUrl = settings.Slack_Shift_Webhook_URL__c;
+        if (String.isBlank(webhookUrl)) return;
+
         Set<Id> shiftIds = new Set<Id>();
         Set<Id> userIds = new Set<Id>();
         for (ShiftChangeEvent evt : events) {
@@ -152,11 +173,6 @@ public with sharing class ShiftTriggerHandler {
         Map<Id, User> userMap = new Map<Id, User>([
             SELECT Id, Email, Name FROM User WHERE Id IN :userIds
         ]);
-
-        String webhookUrl = Label.Slack_Shift_Webhook_URL;
-        if (String.isBlank(webhookUrl) || webhookUrl == 'PASTE_WEBHOOK_URL_HERE') {
-            return;
-        }
 
         // Collect session IDs for owner notifications
         Set<Id> sessionIds = new Set<Id>();
@@ -227,8 +243,8 @@ public with sharing class ShiftTriggerHandler {
         }
 
         if (!ownerPayloads.isEmpty()) {
-            String ownerWebhookUrl = Label.Slack_Owner_Webhook_URL;
-            if (String.isNotBlank(ownerWebhookUrl) && ownerWebhookUrl != 'PASTE_WEBHOOK_URL_HERE') {
+            String ownerWebhookUrl = settings.Slack_Owner_Webhook_URL__c;
+            if (String.isNotBlank(ownerWebhookUrl)) {
                 sendSlackNotifications(ownerWebhookUrl, ownerPayloads);
             }
         }

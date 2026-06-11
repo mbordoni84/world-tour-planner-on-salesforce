@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feat/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lwc-tests:
+    name: LWC Jest Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: WTPlanner
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: WTPlanner/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest tests
+        run: npm run test:unit
+
+  apex-tests:
+    name: Apex Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: WTPlanner
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+
+      - name: Authenticate Dev Hub
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > /tmp/sfdx-auth.txt
+          sf org login sfdx-url --sfdx-url-file /tmp/sfdx-auth.txt --set-default-dev-hub --alias devhub
+          rm /tmp/sfdx-auth.txt
+
+      - name: Create scratch org
+        run: |
+          sf org create scratch \
+            --definition-file config/project-scratch-def.json \
+            --alias ci-scratch \
+            --set-default \
+            --duration-days 1
+
+      - name: Deploy source
+        run: sf project deploy start --target-org ci-scratch
+
+      - name: Run Apex tests
+        run: |
+          sf apex run test \
+            --target-org ci-scratch \
+            --code-coverage \
+            --result-format human \
+            --wait 10
+
+      - name: Delete scratch org
+        if: always()
+        run: sf org delete scratch --target-org ci-scratch --no-prompt
+
+  package-validate:
+    name: Validate Package Version
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [lwc-tests, apex-tests]
+    defaults:
+      run:
+        working-directory: WTPlanner
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+
+      - name: Authenticate Dev Hub
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > /tmp/sfdx-auth.txt
+          sf org login sfdx-url --sfdx-url-file /tmp/sfdx-auth.txt --set-default-dev-hub --alias devhub
+          rm /tmp/sfdx-auth.txt
+
+      - name: Create package version (dry-run validation)
+        run: |
+          sf package version create \
+            --package "World Tour Staffing" \
+            --installation-key-bypass \
+            --wait 20 \
+            --target-dev-hub devhub \
+            --skip-validation
