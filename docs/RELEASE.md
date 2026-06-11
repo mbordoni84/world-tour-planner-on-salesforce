@@ -55,9 +55,10 @@ sf package install --package <new-04t-id> --target-org <new-event-org> --wait 10
 
 ## Version history
 
-| Version | Package Version Id | Notes |
-|---|---|---|
-| 0.1.0 | `04tJ90000009HYvIAM` | Initial packaged release |
+| Version | Package Version Id | Install URL | Notes |
+|---|---|---|---|
+| 0.1.0 | `04tJ90000009HYvIAM` | `...p0=04tJ90000009HYvIAM` | Initial packaged release (Dev Hub: prod org) |
+| 0.1.0-1 | `04tfj000000KYbpAAG` | `...p0=04tfj000000KYbpAAG` | Add demo data seed script (Dev Hub: permanent DE) |
 
 ## Dev Hub
 
