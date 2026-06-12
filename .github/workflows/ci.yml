@@ -66,6 +66,12 @@ jobs:
       - name: Deploy source
         run: sf project deploy start --target-org ci-scratch
 
+      - name: Assign Staffing_App_Admin to scratch user
+        # Tests do user-mode DML on Shift__c.User__c; scratch sysadmin
+        # profile doesn't grant FLS edit on every custom field by default,
+        # so we assign the permset that does.
+        run: sf org assign permset --target-org ci-scratch --name Staffing_App_Admin
+
       - name: Run Apex tests
         run: |
           sf apex run test \
