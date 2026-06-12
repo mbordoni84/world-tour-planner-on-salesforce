@@ -54,6 +54,15 @@ jobs:
             --set-default \
             --duration-days 1
 
+      - name: Strip Agentforce-only metadata before deploy
+        # The default scratch org doesn't have Agentforce enabled, so
+        # AiAuthoringBundle can't deploy there and the agentAccesses block
+        # on Staffing_Assistant_Access fails to resolve a non-existent Bot.
+        # Remove both for CI only; they stay in the source for real deploys.
+        run: |
+          rm -rf force-app/main/default/aiAuthoringBundles
+          rm -f force-app/main/default/permissionsets/Staffing_Assistant_Access.permissionset-meta.xml
+
       - name: Deploy source
         run: sf project deploy start --target-org ci-scratch
 
