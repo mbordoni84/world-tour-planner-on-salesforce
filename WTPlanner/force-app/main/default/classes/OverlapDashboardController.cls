@@ -73,8 +73,10 @@ public with sharing class OverlapDashboardController {
                 throw ex;
             }
 
-            shift.User__c = null;
-            update as user shift;
+            // Detached patch update — see ShiftMarketplaceController.claimShift
+            // for why we patch only the changed field via a new SObject.
+            Shift__c patch = new Shift__c(Id = shift.Id, User__c = null);
+            update as user patch;
         } catch (AuraHandledException e) {
             throw e;
         } catch (Exception e) {

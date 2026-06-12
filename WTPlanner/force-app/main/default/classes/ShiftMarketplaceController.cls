@@ -85,8 +85,12 @@ public with sharing class ShiftMarketplaceController {
                 throw ex;
             }
 
-            shift.User__c = UserInfo.getUserId();
-            update as user shift;
+            // Detached patch update — we change User__c only. Building a
+            // new SObject with just Id + the changed field avoids USER_MODE
+            // checks against the master-detail Session__c field, which is
+            // not user-updateable on Shift__c.
+            Shift__c patch = new Shift__c(Id = shift.Id, User__c = UserInfo.getUserId());
+            update as user patch;
 
             return shift.Id;
         } catch (AuraHandledException e) {
@@ -155,10 +159,10 @@ public with sharing class ShiftMarketplaceController {
                 return newShift.Id;
             }
 
-            Shift__c shift = availableShifts[0];
-            shift.User__c = UserInfo.getUserId();
-            update as user shift;
-            return shift.Id;
+            // See claimShift() for why we patch via a detached SObject.
+            Shift__c patch = new Shift__c(Id = availableShifts[0].Id, User__c = UserInfo.getUserId());
+            update as user patch;
+            return patch.Id;
         } catch (AuraHandledException e) {
             throw e;
         } catch (Exception e) {
@@ -188,8 +192,9 @@ public with sharing class ShiftMarketplaceController {
                 throw ex;
             }
 
-            shift.User__c = null;
-            update as user shift;
+            // See claimShift() for why we patch via a detached SObject.
+            Shift__c patch = new Shift__c(Id = shift.Id, User__c = null);
+            update as user patch;
         } catch (AuraHandledException e) {
             throw e;
         } catch (Exception e) {
