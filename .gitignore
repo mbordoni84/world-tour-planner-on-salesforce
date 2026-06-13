@@ -59,7 +59,13 @@ Desktop.ini
 
 # Husky
 .husky/_
+
+# macOS Finder folder icons (file is literally "Icon" + CR)
+Icon?
 Icon
 
 # Agentforce: generated artifacts from `sf agent publish` (do not commit)
 WTPlanner/force-app/main/default/genAiPlannerBundles/
+
+# Local Claude Code settings
+**/.claude/settings.local.json

@@ -17,13 +17,13 @@ Salesforce app for managing shift scheduling and staff assignments at event sess
 Use this URL to install on any Salesforce org:
 
 ```
-https://login.salesforce.com/packaging/installPackage.apexp?p0=04tJ90000009HYvIAM
+https://login.salesforce.com/packaging/installPackage.apexp?p0=04tfj000000KYbpAAG
 ```
 
 Or via CLI:
 
 ```bash
-sf package install --package 04tJ90000009HYvIAM --target-org <your-org> --wait 10
+sf package install --package 04tfj000000KYbpAAG --target-org <your-org> --wait 10
 ```
 
 After install, see [docs/INSTALL.md](docs/INSTALL.md) for post-install setup.

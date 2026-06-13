@@ -6,14 +6,14 @@ Steps to set up the World Tour Staffing app on a fresh org for a new event.
 
 Via browser (recommended for first install):
 ```
-https://login.salesforce.com/packaging/installPackage.apexp?p0=04tJ90000009HYvIAM
+https://login.salesforce.com/packaging/installPackage.apexp?p0=04tfj000000KYbpAAG
 ```
 
 Choose **"Install for All Users"** when prompted.
 
 Via CLI:
 ```bash
-sf package install --package 04tJ90000009HYvIAM --target-org <alias> --wait 10
+sf package install --package 04tfj000000KYbpAAG --target-org <alias> --wait 10
 ```
 
 ## 2. Assign permission sets
@@ -37,9 +37,14 @@ The app ships with no data. Create records in this order:
 3. **Session__c** — individual sessions linked to a Session Type
 4. **Shift__c** — time slots within each session (leave `User__c` blank = unclaimed)
 
-Or run the seed script if available:
+Or run a seed script:
+
 ```bash
-sf apex run --file scripts/apex/generate-data.apex --target-org <alias>
+# Realistic World Tour dataset (sessions + shifts, no users)
+sf apex run --file WTPlanner/scripts/apex/seed-demo-data.apex --target-org <alias>
+
+# Or: synthetic test dataset (15 users, sessions, 30 shifts with overlaps)
+sf apex run --file WTPlanner/scripts/generate-data.apex --target-org <alias>
 ```
 
 ## 4. Open the app

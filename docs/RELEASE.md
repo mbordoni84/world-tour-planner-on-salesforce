@@ -5,7 +5,7 @@ Run this when you have code changes to ship for a new event.
 ## Prerequisites
 
 - An active Dev Hub org with Dev Hub + 2GP enabled
-- Authenticated via CLI: `sf org login web --set-default-dev-hub --alias devhub-permanent`
+- Authenticated via CLI: `sf org login web --set-default-dev-hub --alias my-developer-edition`
 
 ## Steps
 
@@ -26,7 +26,7 @@ sf package version create \
   --package "World Tour Staffing" \
   --installation-key-bypass \
   --wait 20 \
-  --target-dev-hub devhub-permanent
+  --target-dev-hub my-developer-edition
 ```
 
 This takes ~2-3 minutes. On success it prints:
@@ -66,11 +66,11 @@ Currently using: `matteo.bordoni.b78073148571@agentforce.com` (permanent Develop
 
 Login:
 ```bash
-sf org login web --set-default-dev-hub --alias devhub-permanent --instance-url https://orgfarm-86aafb3005-dev-ed.develop.my.salesforce.com
+sf org login web --set-default-dev-hub --alias my-developer-edition --instance-url https://orgfarm-86aafb3005-dev-ed.develop.my.salesforce.com
 ```
 
 Update `SFDX_AUTH_URL` secret in GitHub Actions when the token expires:
 ```bash
-sf org display --verbose --target-org devhub-permanent
+sf org display --verbose --target-org my-developer-edition
 # copy the "Sfdx Auth Url" value → GitHub Settings → Secrets → SFDX_AUTH_URL
 ```
